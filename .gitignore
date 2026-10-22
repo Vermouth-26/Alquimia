@@ -1,0 +1,16 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & temp
+*.log
+npm-debug.log*
+
+# Netlify local dev
+.netlify/
+
+# Environment files
+.env
+.env.local
+.env.*.local

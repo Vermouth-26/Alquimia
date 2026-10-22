@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiesta Alquimia — Vivamos el momento, disfrutemos cada encuentro ;)</title>
+  <meta name="description" content="Web oficial de Fiesta Alquimia. Fechas, destinos, entradas oficiales y fotos de cada joda.">
+  
+  <!-- Open Graph / Meta estático por defecto -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fiestaalquimia.netlify.app/">
+  <meta property="og:title" content="Fiesta Alquimia">
+  <meta property="og:description" content="Vivamos el momento, disfrutemos cada encuentro ;) · Entradas e info oficial">
+  <meta property="og:image" content="https://riwaytrjxkbpdkkpvxvx.supabase.co/storage/v1/object/public/alquimia-media/og-default.jpg">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Fiesta Alquimia">
+  <meta name="twitter:description" content="Vivamos el momento, disfrutemos cada encuentro ;) · Entradas e info oficial">
+  <meta name="twitter:image" content="https://riwaytrjxkbpdkkpvxvx.supabase.co/storage/v1/object/public/alquimia-media/og-default.jpg">
+
+  <!-- Google Fonts: Anton & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Supabase JS v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0A0A0A;
+      --bg-card: #121212;
+      --bg-card-hover: #171717;
+      --red-main: #D32F2F;
+      --red-bright: #E53935;
+      --red-dark: #7A0C12;
+      --white: #FFFFFF;
+      --gray-light: #B5B5B5;
+      --gray-dark: #222222;
+      --gray-border: rgba(255, 255, 255, 0.12);
+      --font-display: 'Anton', sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace, monospace;
+      --radius: 4px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      color-scheme: dark;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      line-height: 1.5;
+      position: relative;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at 50% 0%, rgba(122, 12, 18, 0.35) 0%, rgba(10, 10, 10, 0.98) 70%);
+      background-repeat: no-repeat;
+    }
+
+    /* Fondo dinámico configurable vía site_settings */
+    #custom-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: none;
+    }
+    #custom-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.78);
+      backdrop-filter: blur(2px);
+    }
+
+    /* Grano / ruido sobre toda la página */
+    .grain-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.08;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Layout container */
+    .container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Header / Hero */
+    .hero {
+      padding: 40px 16px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .hero-logo-box {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+    }
+
+    .hero-logo-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .hero-logo-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 9vw, 4.2rem);
+      letter-spacing: 2px;
+      line-height: 0.95;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 8px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    .hero-tagline {
+      font-size: clamp(0.9rem, 3.5vw, 1.05rem);
+      color: var(--gray-light);
+      max-width: 480px;
+      margin: 0 auto 16px;
+      font-style: italic;
+    }
+
+    .hero-ig-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--white);
+      background-color: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    .hero-ig-btn:hover {
+      background-color: rgba(211, 47, 47, 0.2);
+      border-color: var(--red-main);
+      transform: translateY(-1px);
+    }
+    .hero-ig-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Secciones */
+    section {
+      padding: 24px 0 40px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--red-dark);
+      padding-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .group-header {
+      margin: 32px 0 16px;
+      padding: 6px 12px;
+      background: linear-gradient(90deg, rgba(122, 12, 18, 0.7), transparent);
+      border-left: 4px solid var(--red-main);
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    /* Grid de jodas */
+    .events-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    @media (min-width: 768px) {
+      .events-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Card de joda */
+    .event-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .event-card:hover {
+      border-color: rgba(211, 47, 47, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    /* Flyer container */
+    .card-flyer-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background-color: var(--bg-dark);
+      overflow: hidden;
+    }
+
+    .card-flyer-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .event-card:hover .card-flyer-img {
+      transform: scale(1.03);
+    }
+
+    /* Flyer fallback con logo marca de agua */
+    .card-flyer-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #7A0C12 0%, #150204 100%);
+      color: rgba(255, 255, 255, 0.15);
+      position: relative;
+    }
+    .card-flyer-placeholder svg {
+      width: 50%;
+      height: 50%;
+    }
+
+    /* Gradient overlay sobre flyer */
+    .card-flyer-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(18,18,18,0.95) 100%);
+      pointer-events: none;
+    }
+
+    /* Fecha destacada sobre el flyer */
+    .card-date-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background-color: var(--red-main);
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    .card-time-badge {
+      font-size: 0.8rem;
+      font-family: var(--font-body);
+      font-weight: 700;
+      margin-left: 4px;
+      opacity: 0.9;
+    }
+
+    /* Card Content */
+    .card-body {
+      padding: 18px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      gap: 14px;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      line-height: 1.05;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    /* Tablero de Destino tipo Split-Flap (§6) */
+    .flap-board-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .flap-board-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--gray-light);
+      text-transform: uppercase;
+    }
+
+    .flap-board {
+      display: flex;
+      gap: 3px;
+      background: #000;
+      padding: 6px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .flap-cell {
+      width: 22px;
+      height: 32px;
+      background: #181818;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 2px;
+      color: var(--white);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+    }
+
+    /* Línea divisoria en el medio de la ficha */
+    .flap-cell::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.85);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .flap-cell.empty {
+      background: #101010;
+    }
+
+    /* Información de venue y lineup */
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: var(--gray-light);
+    }
+
+    .card-venue {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--white);
+      font-weight: 600;
+    }
+    .card-venue svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--red-bright);
+      flex-shrink: 0;
+    }
+
+    .card-lineup {
+      font-size: 0.85rem;
+      white-space: pre-line;
+      color: #DDD;
+      border-left: 2px solid var(--red-dark);
+      padding-left: 8px;
+      margin-top: 2px;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--gray-light);
+      line-height: 1.4;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      align-self: flex-start;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: var(--radius);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-preparando {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--gray-light);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .status-tanda_1, .status-tanda_2 {
+      background-color: rgba(211, 47, 47, 0.2);
+      color: #FF6B6B;
+      border: 1px solid var(--red-main);
+    }
+
+    .status-ultima_tanda {
+      background-color: var(--red-main);
+      color: var(--white);
+      border: 1px solid #FF1744;
+      animation: pulse-red 2s infinite ease-in-out;
+    }
+
+    .status-agotado {
+      background-color: #202020;
+      color: #777;
+      border: 1px solid #333;
+      text-decoration: line-through;
+    }
+
+    .status-en_curso {
+      background-color: #E65100;
+      color: var(--white);
+      border: 1px solid #FF9800;
+      animation: pulse-orange 1.5s infinite;
+    }
+
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(0.98); }
+    }
+    @keyframes pulse-orange {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    /* Cuenta regresiva */
+    .countdown-box {
+      background-color: #080808;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #E0E0E0;
+      letter-spacing: 0.5px;
+    }
+    .countdown-urgent {
+      color: #FF5252;
+      border-color: rgba(211, 47, 47, 0.4);
+      background-color: rgba(211, 47, 47, 0.08);
+      font-size: 1rem;
+    }
+
+    /* Botones de acción */
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.15s, opacity 0.2s;
+      min-height: 46px;
+    }
+
+    .btn-ticket {
+      background-color: var(--red-main);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(211, 47, 47, 0.4);
+    }
+    .btn-ticket:hover {
+      background-color: var(--red-bright);
+      transform: translateY(-1px);
+    }
+
+    .btn-disabled {
+      background-color: #222;
+      color: #666;
+      cursor: not-allowed;
+      border: 1px solid #333;
+    }
+
+    .btn-share {
+      background-color: transparent;
+      color: var(--white);
+      border: 1px solid var(--gray-border);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 700;
+      min-height: 40px;
+    }
+    .btn-share:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .btn-share svg {
+      width: 16px;
+      height: 16px;
+      fill: #25D366;
+    }
+
+    .card-notice {
+      font-size: 0.85rem;
+      color: var(--gray-light);
+      text-align: center;
+      padding: 6px 0;
+    }
+    .card-notice a {
+      color: var(--red-bright);
+      text-decoration: underline;
+    }
+
+    /* Sección Fotos Pasadas */
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .photo-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .photo-flyer-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .photo-flyer-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Estado: Revelando fotos (B&W + blur oscilante) */
+    .photo-card-developing .photo-flyer-img {
+      filter: grayscale(100%);
+      animation: blur-oscillate 5s infinite ease-in-out;
+    }
+
+    @keyframes blur-oscillate {
+      0%, 100% { filter: grayscale(100%) blur(10px); }
+      50% { filter: grayscale(100%) blur(4px); }
+    }
+
+    .photo-card-developing .developing-badge {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .developing-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .developing-subtitle {
+      font-size: 0.8rem;
+      color: var(--gray-light);
+      font-weight: 600;
+    }
+
+    /* Estado: Fotos listas */
+    .photo-card-ready {
+      border: 1.5px solid var(--red-main);
+      box-shadow: 0 4px 15px rgba(211, 47, 47, 0.2);
+    }
+    .photo-card-ready .photo-flyer-img {
+      filter: none;
+    }
+
+    .photo-card-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .photo-card-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      line-height: 1.1;
+      color: var(--white);
+    }
+
+    .photo-card-date {
+      font-size: 0.8rem;
+      color: var(--gray-light);
+      font-weight: 600;
+    }
+
+    .btn-drive {
+      background-color: var(--red-main);
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 10px;
+      text-align: center;
+      border-radius: var(--radius);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-drive:hover {
+      background-color: var(--red-bright);
+    }
+
+    .photos-more-wrap {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    /* Empty state & Error message */
+    .empty-state {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed var(--gray-border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .empty-state-text {
+      font-size: 1.05rem;
+      color: var(--gray-light);
+      max-width: 360px;
+    }
+
+    .error-box {
+      background: rgba(122, 12, 18, 0.4);
+      border: 1px solid var(--red-main);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      margin: 20px 0;
+      display: none;
+    }
+    .error-box-text {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: #FFF;
+    }
+    .btn-retry {
+      background: var(--red-main);
+      color: var(--white);
+      border: none;
+      padding: 8px 18px;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 1px;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+
+    /* Skeletons */
+    .skeleton-card {
+      background: var(--bg-card);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      animation: pulse-skeleton 1.5s infinite ease-in-out;
+    }
+    @keyframes pulse-skeleton {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--gray-border);
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--gray-light);
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-top: 40px;
+    }
+
+    .footer-logo {
+      width: 36px;
+      height: 36px;
+      color: var(--white);
+      opacity: 0.8;
+    }
+
+    .footer-link {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-link:hover {
+      color: var(--red-bright);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fondo configurable dinámico -->
+  <div id="custom-bg"></div>
+
+  <!-- Capa de grano constante -->
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <main class="container">
+    
+    <!-- 5.1 HERO -->
+    <header class="hero" id="hero">
+      <div class="hero-logo-box" id="logo-container">
+        <!-- SVG Tipi Placeholder Inicial -->
+        <svg class="hero-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Fiesta Alquimia">
+          <path d="M50 10L16 88H84L50 10Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M42 4L50 16L58 4" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <line x1="28" y1="56" x2="72" y2="56" stroke="currentColor" stroke-width="4"/>
+          <line x1="22" y1="72" x2="78" y2="72" stroke="currentColor" stroke-width="4"/>
+          <polygon points="50,65 38,88 62,88" fill="currentColor"/>
+        </svg>
+      </div>
+      <h1 class="hero-title" id="site-title">Fiesta Alquimia</h1>
+      <p class="hero-tagline" id="site-tagline">Vivamos el momento, disfrutemos cada encuentro ;)</p>
+      <a href="https://www.instagram.com/fiestaalquimia/" target="_blank" rel="noopener noreferrer" class="hero-ig-btn" id="hero-ig-link">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        <span>@fiestaalquimia</span>
+      </a>
+    </header>
+
+    <!-- Error Banner Fail-Safe -->
+    <div id="error-box" class="error-box" role="alert">
+      <p class="error-box-text">No pudimos cargar las jodas en este momento.</p>
+      <button type="button" class="btn-retry" id="btn-retry">Reintentar</button>
+    </div>
+
+    <!-- 5.2 PRÓXIMAS JODAS -->
+    <section id="proximas-section">
+      <div class="section-header">
+        <h2 class="section-title">Próximas Jodas</h2>
+      </div>
+
+      <div id="events-container">
+        <!-- Skeleton loaders iniciales -->
+        <div class="events-grid" id="events-skeletons">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5.3 FOTOS DE JODAS PASADAS -->
+    <section id="fotos-section" style="display: none;">
+      <div class="section-header">
+        <h2 class="section-title">Fotos de Jodas Pasadas</h2>
+      </div>
+
+      <div class="photos-grid" id="photos-container"></div>
+      
+      <div class="photos-more-wrap" id="photos-more-wrap" style="display: none;">
+        <button type="button" class="btn btn-share" id="btn-more-photos">Ver más fotos</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 5.4 FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 10L16 88H84L50 10Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+        <line x1="28" y1="56" x2="72" y2="56" stroke="currentColor" stroke-width="4"/>
+        <line x1="22" y1="72" x2="78" y2="72" stroke="currentColor" stroke-width="4"/>
+      </svg>
+    </div>
+    <p><a href="https://www.instagram.com/fiestaalquimia/" target="_blank" rel="noopener noreferrer" class="footer-link" id="footer-ig-link">@fiestaalquimia</a></p>
+    <p id="footer-copyright">© Fiesta Alquimia</p>
+  </footer>
+
+  <!-- LÓGICA DE APLICACIÓN -->
+  <script>
+    // ⚠️ COMPLETAR: Credenciales públicas de Supabase (la seguridad la da RLS en la base)
+    const SUPABASE_URL = 'https://riwaytrjxkbpdkkpvxvx.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpd2F5dHJqeGticGRra3B2eHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MjUyODUsImV4cCI6MjEwODIwMTI4NX0.oMu0L2ADnT20BGDk1tIIacScvvxiNh3EP50SaA-aiAw';
+    const FINISH_AFTER_HOURS = 12;
+
+    // Inicializar cliente Supabase
+    let supabaseClient = null;
+    if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    // Estado global de la aplicación
+    let activeEvents = [];
+    let pastEvents = [];
+    let pastEventsDisplayLimit = 12;
+    let countdownIntervalId = null;
+
+    // Formateadores de fecha en zona horaria de Argentina
+    const dateFormatter = new Intl.DateTimeFormat('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit'
+    });
+
+    const timeFormatter = new Intl.DateTimeFormat('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+
+    // Formatear texto estilo flyer: "SÁB 10.10" en mayúsculas
+    function formatFlyerDate(isoString) {
+      try {
+        const d = new Date(isoString);
+        const parts = dateFormatter.formatToParts(d);
+        let weekday = '';
+        let day = '';
+        let month = '';
+        for (const p of parts) {
+          if (p.type === 'weekday') weekday = p.value.replace('.', '');
+          if (p.type === 'day') day = p.value;
+          if (p.type === 'month') month = p.value;
+        }
+        return `${weekday} ${day}.${month}`.toUpperCase();
+      } catch (err) {
+        return '';
+      }
+    }
+
+    function formatFlyerTime(isoString) {
+      try {
+        const d = new Date(isoString);
+        return timeFormatter.format(d);
+      } catch (err) {
+        return '';
+      }
+    }
+
+    // Validador seguro de URLs para prevenir esquemas javascript: o ataques XSS
+    function sanitizeUrl(url) {
+      if (!url) return '';
+      const trimmed = url.trim();
+      if (/^https?:\/\//i.test(trimmed)) {
+        return trimmed;
+      }
+      return '';
+    }
+
+    // Inicializar página
+    document.addEventListener('DOMContentLoaded', () => {
+      // Año en footer
+      const yearSpan = document.getElementById('footer-copyright');
+      if (yearSpan) {
+        yearSpan.textContent = `© ${new Date().getFullYear()} Fiesta Alquimia`;
+      }
+
+      // Event listener de reintento
+      const retryBtn = document.getElementById('btn-retry');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', loadAllData);
+      }
+
+      // Cargar datos
+      loadAllData();
+    });
+
+    async function loadAllData() {
+      const errorBox = document.getElementById('error-box');
+      errorBox.style.display = 'none';
+
+      try {
+        await Promise.all([loadSiteSettings(), loadEvents()]);
+      } catch (err) {
+        console.error('Error cargando datos de Supabase:', err);
+        errorBox.style.display = 'block';
+        // Remover skeletons
+        const skels = document.getElementById('events-skeletons');
+        if (skels) skels.remove();
+      }
+    }
+
+    // Cargar site_settings
+    async function loadSiteSettings() {
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient
+        .from('site_settings')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('No se pudo leer site_settings:', error.message);
+        return;
+      }
+
+      if (data) {
+        if (data.site_title) {
+          document.title = `${data.site_title} — Vivamos el momento, disfrutemos cada encuentro ;)`;
+          const titleEl = document.getElementById('site-title');
+          if (titleEl) titleEl.textContent = data.site_title;
+        }
+
+        if (data.tagline) {
+          const taglineEl = document.getElementById('site-tagline');
+          if (taglineEl) taglineEl.textContent = data.tagline;
+        }
+
+        if (data.instagram_url) {
+          const validIg = sanitizeUrl(data.instagram_url);
+          if (validIg) {
+            const igHero = document.getElementById('hero-ig-link');
+            if (igHero) igHero.href = validIg;
+            const igFooter = document.getElementById('footer-ig-link');
+            if (igFooter) igFooter.href = validIg;
+          }
+        }
+
+        if (data.background_url) {
+          const validBg = sanitizeUrl(data.background_url);
+          if (validBg) {
+            const bgEl = document.getElementById('custom-bg');
+            if (bgEl) {
+              bgEl.style.backgroundImage = `url("${validBg}")`;
+              bgEl.style.display = 'block';
+            }
+          }
+        }
+
+        if (data.logo_url) {
+          const validLogo = sanitizeUrl(data.logo_url);
+          if (validLogo) {
+            const logoBox = document.getElementById('logo-container');
+            if (logoBox) {
+              // Reemplazar de forma segura
+              logoBox.textContent = '';
+              const img = document.createElement('img');
+              img.src = validLogo;
+              img.alt = 'Logo Fiesta Alquimia';
+              img.className = 'hero-logo-img';
+              logoBox.appendChild(img);
+            }
+          }
+        }
+      }
+    }
+
+    // Cargar eventos
+    async function loadEvents() {
+      if (!supabaseClient) {
+        throw new Error('Supabase no inicializado');
+      }
+
+      const { data, error } = await supabaseClient
+        .from('events')
+        .select('*')
+        .eq('published', true)
+        .order('event_date', { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      const now = Date.now();
+      const finishWindowMs = FINISH_AFTER_HOURS * 3600 * 1000;
+
+      activeEvents = [];
+      pastEvents = [];
+
+      (data || []).forEach(evt => {
+        const evtTime = new Date(evt.event_date).getTime();
+        const finishTime = evtTime + finishWindowMs;
+
+        if (now > finishTime) {
+          pastEvents.push(evt);
+        } else {
+          activeEvents.push(evt);
+        }
+      });
+
+      // Ordenar pasadas de más reciente a más antigua
+      pastEvents.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime());
+
+      renderUpcomingEvents(activeEvents);
+      renderPastEvents(pastEvents);
+      startGlobalCountdown();
+    }
+
+    // Renderizar próximas jodas (§5.2)
+    function renderUpcomingEvents(events) {
+      const container = document.getElementById('events-container');
+      container.textContent = ''; // Limpiar skeletons
+
+      if (!events || events.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'empty-state';
+
+        const p = document.createElement('p');
+        p.className = 'empty-state-text';
+        p.textContent = 'Estamos preparando la próxima. Seguinos en Instagram para enterarte primero.';
+        emptyDiv.appendChild(p);
+
+        const a = document.createElement('a');
+        a.className = 'hero-ig-btn';
+        a.href = document.getElementById('hero-ig-link')?.href || 'https://www.instagram.com/fiestaalquimia/';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = 'Seguinos en Instagram';
+        emptyDiv.appendChild(a);
+
+        container.appendChild(emptyDiv);
+        return;
+      }
+
+      // Agrupar por group_name si existe
+      // Estructura: Map de groupName -> array de eventos (o null para sin grupo)
+      const groups = new Map();
+      events.forEach(evt => {
+        const g = evt.group_name && evt.group_name.trim() !== '' ? evt.group_name.trim() : null;
+        if (!groups.has(g)) {
+          groups.set(g, []);
+        }
+        groups.get(g).push(evt);
+      });
+
+      // Primero renderizar grupos con nombre, luego los sueltos (o en orden de aparición)
+      for (const [groupName, groupEvents] of groups.entries()) {
+        if (groupName) {
+          const header = document.createElement('h3');
+          header.className = 'group-header';
+          header.textContent = groupName;
+          container.appendChild(header);
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'events-grid';
+
+        groupEvents.forEach(evt => {
+          const card = createEventCard(evt);
+          grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+      }
+    }
+
+    // Construcción DOM segura de cada Card de joda (sin innerHTML con datos de BD)
+    function createEventCard(evt) {
+      const card = document.createElement('article');
+      card.className = 'event-card';
+
+      const evtDate = new Date(evt.event_date);
+      const now = Date.now();
+      const isEnCurso = now >= evtDate.getTime() && now <= (evtDate.getTime() + FINISH_AFTER_HOURS * 3600 * 1000);
+
+      // 1. Flyer wrap
+      const flyerWrap = document.createElement('div');
+      flyerWrap.className = 'card-flyer-wrap';
+
+      const validFlyer = sanitizeUrl(evt.flyer_url);
+      if (validFlyer) {
+        const img = document.createElement('img');
+        img.className = 'card-flyer-img';
+        img.src = validFlyer;
+        img.alt = `Flyer de ${evt.title}`;
+        img.loading = 'lazy';
+        flyerWrap.appendChild(img);
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'card-flyer-placeholder';
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 100 100');
+        svg.setAttribute('fill', 'none');
+        svg.innerHTML = '<path d="M50 10L16 88H84L50 10Z" stroke="currentColor" stroke-width="5"/><line x1="28" y1="56" x2="72" y2="56" stroke="currentColor" stroke-width="4"/><polygon points="50,65 38,88 62,88" fill="currentColor"/>';
+        placeholder.appendChild(svg);
+        flyerWrap.appendChild(placeholder);
+      }
+
+      const overlay = document.createElement('div');
+      overlay.className = 'card-flyer-overlay';
+      flyerWrap.appendChild(overlay);
+
+      // Fecha sobre el flyer: "SÁB 10.10"
+      const dateBadge = document.createElement('div');
+      dateBadge.className = 'card-date-badge';
+      dateBadge.textContent = formatFlyerDate(evt.event_date);
+
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'card-time-badge';
+      const timeStr = formatFlyerTime(evt.event_date);
+      if (timeStr) timeSpan.textContent = `· ${timeStr} HS`;
+      dateBadge.appendChild(timeSpan);
+      flyerWrap.appendChild(dateBadge);
+
+      card.appendChild(flyerWrap);
+
+      // 2. Card Body
+      const body = document.createElement('div');
+      body.className = 'card-body';
+
+      // Badge de estado (§7)
+      const badge = document.createElement('span');
+      badge.className = 'status-badge';
+      if (isEnCurso) {
+        badge.classList.add('status-en_curso');
+        badge.textContent = 'ES HOY 🔥';
+      } else {
+        badge.classList.add(`status-${evt.status}`);
+        switch (evt.status) {
+          case 'preparando':
+            badge.textContent = 'PREPARANDO JODA';
+            break;
+          case 'tanda_1':
+            badge.textContent = 'ENTRADAS A LA VENTA · TANDA 1';
+            break;
+          case 'tanda_2':
+            badge.textContent = 'ENTRADAS A LA VENTA · TANDA 2';
+            break;
+          case 'ultima_tanda':
+            badge.textContent = 'ÚLTIMA TANDA';
+            break;
+          case 'agotado':
+            badge.textContent = 'AGOTADO';
+            break;
+          default:
+            badge.textContent = evt.status.toUpperCase();
+        }
+      }
+      body.appendChild(badge);
+
+      // Título
+      const title = document.createElement('h3');
+      title.className = 'card-title';
+      title.textContent = evt.title;
+      body.appendChild(title);
+
+      // Tablero de Destino (§6)
+      if (evt.destination && evt.destination.trim() !== '') {
+        const flapWrap = document.createElement('div');
+        flapWrap.className = 'flap-board-wrap';
+
+        const flapLabel = document.createElement('span');
+        flapLabel.className = 'flap-board-label';
+        flapLabel.textContent = 'DESTINO';
+        flapWrap.appendChild(flapLabel);
+
+        const board = createSplitFlapBoard(evt.destination.trim().toUpperCase());
+        flapWrap.appendChild(board);
+        body.appendChild(flapWrap);
+      }
+
+      // Metadata (Lugar / Lineup / Descripción)
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+
+      if (evt.venue && evt.venue.trim() !== '') {
+        const venueP = document.createElement('p');
+        venueP.className = 'card-venue';
+        const locSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        locSvg.setAttribute('viewBox', '0 0 24 24');
+        locSvg.innerHTML = '<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>';
+        venueP.appendChild(locSvg);
+        const venueSpan = document.createElement('span');
+        venueSpan.textContent = evt.venue;
+        venueP.appendChild(venueSpan);
+        meta.appendChild(venueP);
+      }
+
+      if (evt.lineup && evt.lineup.trim() !== '') {
+        const lineupP = document.createElement('p');
+        lineupP.className = 'card-lineup';
+        lineupP.textContent = evt.lineup;
+        meta.appendChild(lineupP);
+      }
+
+      if (evt.description && evt.description.trim() !== '') {
+        const descP = document.createElement('p');
+        descP.className = 'card-desc';
+        descP.textContent = evt.description;
+        meta.appendChild(descP);
+      }
+
+      body.appendChild(meta);
+
+      // Cuenta regresiva (§8)
+      const countdownBox = document.createElement('div');
+      countdownBox.className = 'countdown-box';
+      countdownBox.dataset.eventDate = evt.event_date;
+      body.appendChild(countdownBox);
+
+      // Acciones (Botón de entradas + Compartir)
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+
+      const validTicketUrl = sanitizeUrl(evt.ticket_url);
+
+      if (isEnCurso) {
+        // En curso: sin botón de compra
+      } else if (evt.status === 'preparando') {
+        const notice = document.createElement('p');
+        notice.className = 'card-notice';
+        notice.textContent = 'Muy pronto entradas disponibles. ';
+        const igLink = document.createElement('a');
+        igLink.href = document.getElementById('hero-ig-link')?.href || 'https://www.instagram.com/fiestaalquimia/';
+        igLink.target = '_blank';
+        igLink.rel = 'noopener noreferrer';
+        igLink.textContent = 'Seguinos en Instagram';
+        notice.appendChild(igLink);
+        actions.appendChild(notice);
+      } else if (evt.status === 'agotado') {
+        const btnDisabled = document.createElement('button');
+        btnDisabled.type = 'button';
+        btnDisabled.className = 'btn btn-disabled';
+        btnDisabled.disabled = true;
+        btnDisabled.textContent = 'Agotado';
+        actions.appendChild(btnDisabled);
+      } else if (['tanda_1', 'tanda_2', 'ultima_tanda'].includes(evt.status)) {
+        if (validTicketUrl) {
+          const btnTicket = document.createElement('a');
+          btnTicket.className = 'btn btn-ticket';
+          btnTicket.href = validTicketUrl;
+          btnTicket.target = '_blank';
+          btnTicket.rel = 'noopener noreferrer';
+          btnTicket.textContent = evt.ticket_button_label || 'Conseguir entradas';
+          actions.appendChild(btnTicket);
+        }
+      }
+
+      // Botón Compartir por WhatsApp
+      const btnShare = document.createElement('a');
+      btnShare.className = 'btn btn-share';
+      const destText = evt.destination ? ` en ${evt.destination}` : '';
+      const shareMsg = `🔥 ${evt.title} — ${formatFlyerDate(evt.event_date)}${destText}. Entradas e info: ${window.location.href}`;
+      btnShare.href = `https://wa.me/?text=${encodeURIComponent(shareMsg)}`;
+      btnShare.target = '_blank';
+      btnShare.rel = 'noopener noreferrer';
+
+      const waSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      waSvg.setAttribute('viewBox', '0 0 24 24');
+      waSvg.innerHTML = '<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-2.121-.527-1.742-.72-2.85-2.508-2.937-2.624-.087-.116-.708-.941-.708-1.792s.448-1.272.607-1.446c.159-.175.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.072.376-.044.101-.116.433-.506.549-.68.116-.174.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>';
+      btnShare.appendChild(waSvg);
+
+      const shareSpan = document.createElement('span');
+      shareSpan.textContent = 'Compartir';
+      btnShare.appendChild(shareSpan);
+
+      actions.appendChild(btnShare);
+      body.appendChild(actions);
+
+      card.appendChild(body);
+      return card;
+    }
+
+    // Tablero Aeropuerto Split-Flap (§6)
+    function createSplitFlapBoard(destination) {
+      const board = document.createElement('div');
+      board.className = 'flap-board';
+      board.setAttribute('aria-label', `Destino: ${destination}`);
+
+      const maxCells = 16;
+      const targetStr = destination.padEnd(maxCells, ' ').slice(0, maxCells);
+      const cellElements = [];
+
+      for (let i = 0; i < maxCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'flap-cell';
+        cell.setAttribute('aria-hidden', 'true');
+        cell.textContent = ' ';
+        board.appendChild(cell);
+        cellElements.push(cell);
+      }
+
+      // Animar con IntersectionObserver
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            obs.unobserve(entry.target);
+            animateBoard(cellElements, targetStr);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      observer.observe(board);
+      return board;
+    }
+
+    function animateBoard(cellElements, targetStr) {
+      // Respetar prefers-reduced-motion (§6)
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) {
+        cellElements.forEach((cell, idx) => {
+          const char = targetStr[idx] || ' ';
+          cell.textContent = char;
+          if (char === ' ') cell.classList.add('empty');
+        });
+        return;
+      }
+
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+      cellElements.forEach((cell, idx) => {
+        const finalChar = targetStr[idx] || ' ';
+        const delay = idx * 75; // Escalonado entre 60 y 90 ms
+        let flips = 0;
+        const maxFlips = 8 + Math.floor(Math.random() * 6);
+
+        setTimeout(() => {
+          const interval = setInterval(() => {
+            flips++;
+            if (flips >= maxFlips) {
+              clearInterval(interval);
+              cell.textContent = finalChar;
+              if (finalChar === ' ') cell.classList.add('empty');
+            } else {
+              cell.textContent = chars[Math.floor(Math.random() * chars.length)];
+            }
+          }, 45);
+        }, delay);
+      });
+    }
+
+    // Cuenta regresiva única global (§8)
+    function startGlobalCountdown() {
+      if (countdownIntervalId) clearInterval(countdownIntervalId);
+
+      function update() {
+        const now = Date.now();
+        const boxes = document.querySelectorAll('.countdown-box');
+
+        boxes.forEach(box => {
+          const dateStr = box.dataset.eventDate;
+          if (!dateStr) return;
+
+          const targetTime = new Date(dateStr).getTime();
+          const diffMs = targetTime - now;
+          const finishTime = targetTime + (FINISH_AFTER_HOURS * 3600 * 1000);
+
+          if (now >= targetTime && now <= finishTime) {
+            box.textContent = '¡ES HOY! 🔥 EN CURSO';
+            box.classList.add('countdown-urgent');
+            return;
+          }
+
+          if (diffMs <= 0) {
+            box.textContent = 'FINALIZADA';
+            box.classList.remove('countdown-urgent');
+            return;
+          }
+
+          const totalSeconds = Math.floor(diffMs / 1000);
+          const days = Math.floor(totalSeconds / 86400);
+          const hours = Math.floor((totalSeconds % 86400) / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+
+          // Si falta menos de 24 horas, mostrar con énfasis formato HH:MM:SS
+          if (days < 1) {
+            const hStr = String(hours).padStart(2, '0');
+            const mStr = String(minutes).padStart(2, '0');
+            const sStr = String(seconds).padStart(2, '0');
+            box.textContent = `FALTA: ${hStr}:${mStr}:${sStr}`;
+            box.classList.add('countdown-urgent');
+          } else {
+            box.textContent = `${days} días · ${hours} h · ${minutes} min · ${seconds} s`;
+            box.classList.remove('countdown-urgent');
+          }
+        });
+      }
+
+      update();
+      countdownIntervalId = setInterval(update, 1000);
+    }
+
+    // Renderizar fotos pasadas (§5.3)
+    function renderPastEvents(events) {
+      const section = document.getElementById('fotos-section');
+      const container = document.getElementById('photos-container');
+      const moreWrap = document.getElementById('photos-more-wrap');
+
+      if (!events || events.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      container.textContent = '';
+
+      const slice = events.slice(0, pastEventsDisplayLimit);
+
+      slice.forEach(evt => {
+        const card = createPhotoCard(evt);
+        container.appendChild(card);
+      });
+
+      if (events.length > pastEventsDisplayLimit) {
+        moreWrap.style.display = 'block';
+        const moreBtn = document.getElementById('btn-more-photos');
+        moreBtn.onclick = () => {
+          pastEventsDisplayLimit += 12;
+          renderPastEvents(events);
+        };
+      } else {
+        moreWrap.style.display = 'none';
+      }
+    }
+
+    function createPhotoCard(evt) {
+      const card = document.createElement('article');
+      card.className = 'photo-card';
+
+      const validDrive = sanitizeUrl(evt.drive_url);
+      const validFlyer = sanitizeUrl(evt.flyer_url);
+
+      const flyerWrap = document.createElement('div');
+      flyerWrap.className = 'photo-flyer-wrap';
+
+      if (validFlyer) {
+        const img = document.createElement('img');
+        img.className = 'photo-flyer-img';
+        img.src = validFlyer;
+        img.alt = `Fotos de ${evt.title}`;
+        img.loading = 'lazy';
+        flyerWrap.appendChild(img);
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'card-flyer-placeholder';
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 100 100');
+        svg.setAttribute('fill', 'none');
+        svg.innerHTML = '<path d="M50 10L16 88H84L50 10Z" stroke="currentColor" stroke-width="5"/><polygon points="50,65 38,88 62,88" fill="currentColor"/>';
+        placeholder.appendChild(svg);
+        flyerWrap.appendChild(placeholder);
+      }
+
+      if (!validDrive) {
+        // Estado: Revelando fotos…
+        card.classList.add('photo-card-developing');
+
+        const devBadge = document.createElement('div');
+        devBadge.className = 'developing-badge';
+
+        const t = document.createElement('span');
+        t.className = 'developing-title';
+        t.textContent = 'Revelando fotos…';
+        devBadge.appendChild(t);
+
+        const daysAgo = Math.max(1, Math.floor((Date.now() - new Date(evt.event_date).getTime()) / (1000 * 3600 * 24)));
+        const st = document.createElement('span');
+        st.className = 'developing-subtitle';
+        st.textContent = `hace ${daysAgo} ${daysAgo === 1 ? 'día' : 'días'}`;
+        devBadge.appendChild(st);
+
+        flyerWrap.appendChild(devBadge);
+      } else {
+        // Estado: Fotos listas
+        card.classList.add('photo-card-ready');
+      }
+
+      card.appendChild(flyerWrap);
+
+      const body = document.createElement('div');
+      body.className = 'photo-card-body';
+
+      const title = document.createElement('h4');
+      title.className = 'photo-card-title';
+      title.textContent = evt.title;
+      body.appendChild(title);
+
+      const dateP = document.createElement('p');
+      dateP.className = 'photo-card-date';
+      const destText = evt.destination ? ` · ${evt.destination}` : '';
+      dateP.textContent = `${formatFlyerDate(evt.event_date)}${destText}`;
+      body.appendChild(dateP);
+
+      if (validDrive) {
+        const btn = document.createElement('a');
+        btn.className = 'btn-drive';
+        btn.href = validDrive;
+        btn.target = '_blank';
+        btn.rel = 'noopener noreferrer';
+        btn.textContent = 'Ver fotos';
+        body.appendChild(btn);
+      }
+
+      card.appendChild(body);
+      return card;
+    }
+  </script>
+</body>
+</html>

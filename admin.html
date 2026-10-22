@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin — Fiesta Alquimia</title>
+
+  <!-- Google Fonts: Anton & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Supabase JS v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-surface-elevated: #1F1F1F;
+      --red-main: #D32F2F;
+      --red-bright: #E53935;
+      --red-dark: #7A0C12;
+      --white: #FFFFFF;
+      --gray-light: #B5B5B5;
+      --gray-muted: #757575;
+      --gray-border: rgba(255, 255, 255, 0.14);
+      --font-display: 'Anton', sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 6px;
+      --touch-min: 44px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Grano suave */
+    .grain-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99999;
+      opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 16px;
+      flex-grow: 1;
+    }
+
+    /* Header Panel */
+    .admin-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--gray-border);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .admin-brand-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--red-bright);
+    }
+
+    .btn-logout {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--gray-border);
+      color: var(--white);
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 36px;
+    }
+    .btn-logout:hover {
+      background: rgba(211, 47, 47, 0.2);
+      border-color: var(--red-main);
+    }
+
+    /* Pestañas de navegación */
+    .admin-tabs {
+      display: flex;
+      background: var(--bg-surface);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius);
+      padding: 4px;
+      margin-bottom: 20px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-height: var(--touch-min);
+      background: transparent;
+      border: none;
+      color: var(--gray-light);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .tab-btn.active {
+      background: var(--red-main);
+      color: var(--white);
+    }
+
+    /* Login Box */
+    .login-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      padding: 16px;
+    }
+
+    .login-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius);
+      padding: 28px 20px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .login-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      text-align: center;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .login-subtitle {
+      font-size: 0.85rem;
+      color: var(--gray-light);
+      text-align: center;
+      margin-top: -10px;
+    }
+
+    /* Formulario genérico & Inputs touch cómodos */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gray-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .char-count {
+      font-size: 0.75rem;
+      color: var(--gray-muted);
+      font-family: var(--font-mono);
+    }
+
+    .form-control {
+      background: #000;
+      border: 1px solid var(--gray-border);
+      color: var(--white);
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      min-height: var(--touch-min);
+      width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--red-bright);
+      box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.25);
+    }
+
+    textarea.form-control {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23B5B5B5' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    /* Checkbox & Switch */
+    .switch-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: var(--touch-min);
+      cursor: pointer;
+      user-select: none;
+      background: var(--bg-surface);
+      border: 1px solid var(--gray-border);
+      padding: 8px 14px;
+      border-radius: var(--radius);
+    }
+
+    .switch-input {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--red-main);
+      cursor: pointer;
+    }
+
+    /* Botones primarios y secundarios */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: var(--touch-min);
+      padding: 10px 18px;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s, opacity 0.15s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--red-main);
+      color: var(--white);
+    }
+    .btn-primary:hover {
+      background: var(--red-bright);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--gray-border);
+      color: var(--white);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn-danger {
+      background: #8B0000;
+      color: var(--white);
+    }
+    .btn-danger:hover {
+      background: #A00000;
+    }
+
+    /* Listado de items */
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 80px; /* Espacio para el FAB */
+    }
+
+    .admin-event-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    .admin-event-card.is-unpublished {
+      border-style: dashed;
+      opacity: 0.8;
+    }
+
+    .admin-card-header {
+      display: flex;
+      gap: 12px;
+    }
+
+    .admin-card-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 4px;
+      object-fit: cover;
+      background: #000;
+      flex-shrink: 0;
+      border: 1px solid var(--gray-border);
+    }
+
+    .admin-card-info {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .admin-card-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      text-transform: uppercase;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .admin-card-meta {
+      font-size: 0.8rem;
+      color: var(--gray-light);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .badge-dest {
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .badge-draft {
+      background: #444;
+      color: #FFF;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+
+    .badge-missing-drive {
+      background: rgba(229, 57, 53, 0.2);
+      border: 1px solid var(--red-bright);
+      color: #FF8A80;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: var(--radius);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-transform: uppercase;
+    }
+
+    /* Selector de estado rápido (§10.2) */
+    .quick-status-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #000;
+      padding: 6px 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-border);
+    }
+
+    .quick-status-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gray-light);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .quick-status-select {
+      background: transparent;
+      border: none;
+      color: var(--white);
+      font-size: 0.85rem;
+      font-weight: 700;
+      width: 100%;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .quick-status-select:focus {
+      outline: none;
+    }
+
+    /* Quick Drive Link Input en Pasadas */
+    .quick-drive-wrap {
+      display: flex;
+      gap: 6px;
+    }
+    .quick-drive-input {
+      font-size: 0.85rem;
+      padding: 8px 10px;
+      min-height: 38px;
+    }
+    .quick-drive-btn {
+      min-height: 38px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    /* Botones de acción del item */
+    .admin-card-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      min-width: 70px;
+      min-height: 38px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--gray-border);
+      color: var(--white);
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .btn-action.btn-del {
+      color: #FF8A80;
+      border-color: rgba(211, 47, 47, 0.4);
+    }
+    .btn-action.btn-del:hover {
+      background: rgba(211, 47, 47, 0.2);
+    }
+
+    /* Floating Action Button (+ Nueva Joda) */
+    .fab-new-event {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 90;
+      background: var(--red-main);
+      color: var(--white);
+      border: 2px solid #FF1744;
+      border-radius: 50px;
+      padding: 12px 24px;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 8px 25px rgba(211, 47, 47, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 52px;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .fab-new-event:active {
+      transform: scale(0.95);
+    }
+
+    /* Modal / Formulario Drawer de Pantalla Completa (§10.3) */
+    .drawer-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: var(--bg-dark);
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--gray-border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .drawer-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    .btn-close-drawer {
+      background: transparent;
+      border: none;
+      color: var(--gray-light);
+      font-size: 1.6rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      min-height: 44px;
+    }
+
+    .drawer-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
+      padding-bottom: 40px;
+    }
+
+    /* Preview en vivo dentro del formulario */
+    .preview-box {
+      background: #000;
+      border: 1px dashed var(--gray-border);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .preview-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-flyer-thumb {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #111;
+      display: none;
+    }
+
+    /* Toast Notification Feedback */
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1B1B1B;
+      color: var(--white);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius);
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .toast-msg.toast-success {
+      border-color: #4CAF50;
+      background: #0E2911;
+    }
+    .toast-msg.toast-error {
+      border-color: var(--red-bright);
+      background: #3B080C;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #FFF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <!-- 10.1 PANTALLA LOGIN (visible cuando NO hay sesión) -->
+  <div id="login-section" class="login-wrapper">
+    <div class="login-card">
+      <h1 class="login-title">Fiesta Alquimia</h1>
+      <p class="login-subtitle">Panel de Administración</p>
+      
+      <form id="login-form">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" class="form-control" required autocomplete="email" placeholder="admin@fiestaalquimia.com">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" class="form-control" required autocomplete="current-password" placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-submit-login" style="width: 100%;">
+          <span class="spinner" id="login-spinner"></span>
+          <span id="login-btn-text">Ingresar</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10.2 PANEL PRINCIPAL (visible cuando HAY sesión) -->
+  <div id="panel-section" class="hidden">
+    <header class="admin-header">
+      <div class="admin-brand">
+        <svg class="admin-brand-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10L16 88H84L50 10Z" stroke="currentColor" stroke-width="8" stroke-linejoin="round"/>
+          <line x1="28" y1="56" x2="72" y2="56" stroke="currentColor" stroke-width="6"/>
+        </svg>
+        <span>Alquimia Admin</span>
+      </div>
+      <button type="button" class="btn-logout" id="btn-logout">Cerrar sesión</button>
+    </header>
+
+    <main class="container">
+      <!-- Pestañas -->
+      <nav class="admin-tabs" aria-label="Navegación del panel">
+        <button type="button" class="tab-btn active" data-tab="tab-proximas">Próximas</button>
+        <button type="button" class="tab-btn" data-tab="tab-pasadas">Pasadas</button>
+        <button type="button" class="tab-btn" data-tab="tab-ajustes">Ajustes</button>
+      </nav>
+
+      <!-- TAB 1: PRÓXIMAS JODAS -->
+      <div id="tab-proximas" class="tab-content">
+        <div class="items-list" id="list-proximas">
+          <p style="color: var(--gray-light); text-align: center; padding: 20px;">Cargando jodas...</p>
+        </div>
+      </div>
+
+      <!-- TAB 2: JODAS PASADAS -->
+      <div id="tab-pasadas" class="tab-content hidden">
+        <div class="items-list" id="list-pasadas">
+          <p style="color: var(--gray-light); text-align: center; padding: 20px;">Cargando jodas pasadas...</p>
+        </div>
+      </div>
+
+      <!-- TAB 3: AJUSTES GENERALES (§10.4) -->
+      <div id="tab-ajustes" class="tab-content hidden">
+        <form id="settings-form" class="drawer-form">
+          <div class="form-group">
+            <label for="set-title">Título de la Web</label>
+            <input type="text" id="set-title" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="set-tagline">Lema / Frase</label>
+            <input type="text" id="set-tagline" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="set-instagram">URL de Instagram</label>
+            <input type="url" id="set-instagram" class="form-control" required placeholder="https://www.instagram.com/fiestaalquimia/">
+          </div>
+
+          <!-- Logo -->
+          <div class="form-group">
+            <label>Logo de la Web</label>
+            <input type="file" id="file-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="form-control">
+            <div id="logo-preview-wrap" style="margin-top: 8px; display: none;">
+              <img id="logo-preview-img" src="" alt="Vista previa de logo" style="max-height: 60px; background: #000; padding: 6px; border-radius: 4px;">
+            </div>
+          </div>
+
+          <!-- Fondo de Pantalla -->
+          <div class="form-group">
+            <label>Imagen de Fondo</label>
+            <input type="file" id="file-bg" accept="image/png,image/jpeg,image/webp" class="form-control">
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button type="button" class="btn btn-secondary" id="btn-remove-bg" style="font-size: 0.8rem; min-height: 36px;">Quitar fondo actual</button>
+            </div>
+            <div id="bg-preview-wrap" style="margin-top: 8px; display: none;">
+              <img id="bg-preview-img" src="" alt="Vista previa de fondo" style="max-height: 90px; border-radius: 4px;">
+            </div>
+          </div>
+
+          <!-- Imagen OG Compartir -->
+          <div class="form-group">
+            <label>Imagen para Compartir (Open Graph WhatsApp/Redes)</label>
+            <input type="file" id="file-og" accept="image/png,image/jpeg,image/webp" class="form-control">
+            <div id="og-preview-wrap" style="margin-top: 8px; display: none;">
+              <img id="og-preview-img" src="" alt="Vista previa OG" style="max-height: 90px; border-radius: 4px;">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-save-settings" style="margin-top: 14px;">
+            <span class="spinner" id="settings-spinner"></span>
+            <span>Guardar Ajustes</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Botón Flotante Nueva Joda (§10.2) -->
+      <button type="button" class="fab-new-event" id="fab-new-event">
+        <span>+ Nueva Joda</span>
+      </button>
+    </main>
+  </div>
+
+  <!-- 10.3 DRAWER / MODAL CREAR O EDITAR JODA -->
+  <div id="drawer-event" class="drawer-modal">
+    <div class="drawer-header">
+      <h2 class="drawer-title" id="drawer-title">Nueva Joda</h2>
+      <button type="button" class="btn-close-drawer" id="btn-close-drawer" aria-label="Cerrar">&times;</button>
+    </div>
+
+    <form id="event-form" class="drawer-form">
+      <input type="hidden" id="evt-id">
+
+      <!-- Título -->
+      <div class="form-group">
+        <label for="evt-title">Título de la Joda *</label>
+        <input type="text" id="evt-title" class="form-control" required placeholder="Ej: Alquimia Pinto">
+      </div>
+
+      <!-- Grupo (con datalist para autocompletar) -->
+      <div class="form-group">
+        <label for="evt-group">Grupo (opcional)</label>
+        <input type="text" id="evt-group" class="form-control" list="groups-datalist" placeholder="Ej: GIRA DE VERANO, CARNAVAL 2027">
+        <datalist id="groups-datalist"></datalist>
+      </div>
+
+      <!-- Fecha y Hora (Argentina) -->
+      <div class="form-group">
+        <label for="evt-date">Fecha y Hora (Horario Argentina) *</label>
+        <input type="datetime-local" id="evt-date" class="form-control" required>
+      </div>
+
+      <!-- Destino (máx 16) -->
+      <div class="form-group">
+        <label for="evt-dest">
+          <span>Destino (máx. 16 caracteres)</span>
+          <span class="char-count" id="count-dest">0/16</span>
+        </label>
+        <input type="text" id="evt-dest" class="form-control" maxlength="16" placeholder="Ej: GENERAL PINTO">
+      </div>
+
+      <!-- Lugar / Boliche -->
+      <div class="form-group">
+        <label for="evt-venue">Lugar / Boliche</label>
+        <input type="text" id="evt-venue" class="form-control" placeholder="Ej: Predio Los Pinos">
+      </div>
+
+      <!-- Line-up -->
+      <div class="form-group">
+        <label for="evt-lineup">Line-up (un artista por línea)</label>
+        <textarea id="evt-lineup" class="form-control" placeholder="DJ Residente&#10;DJ Invitado B2B"></textarea>
+      </div>
+
+      <!-- Descripción (máx 280) -->
+      <div class="form-group">
+        <label for="evt-desc">
+          <span>Descripción (máx. 280 caracteres)</span>
+          <span class="char-count" id="count-desc">0/280</span>
+        </label>
+        <textarea id="evt-desc" class="form-control" maxlength="280" placeholder="Texto corto opcional para promocionar la fecha..."></textarea>
+      </div>
+
+      <!-- Flyer -->
+      <div class="form-group">
+        <label for="evt-file-flyer">Flyer (imagen desde galería o cámara)</label>
+        <input type="file" id="evt-file-flyer" accept="image/jpeg,image/png,image/webp" class="form-control">
+        <input type="hidden" id="evt-flyer-url">
+        <img id="evt-flyer-preview" class="preview-flyer-thumb" alt="Vista previa flyer">
+      </div>
+
+      <!-- Entradas -->
+      <div class="form-group">
+        <label for="evt-ticket-url">Link de Entradas</label>
+        <input type="url" id="evt-ticket-url" class="form-control" placeholder="https://passline.com/...">
+      </div>
+
+      <div class="form-group">
+        <label for="evt-ticket-label">Texto del Botón de Entradas</label>
+        <input type="text" id="evt-ticket-label" class="form-control" value="Conseguir entradas">
+      </div>
+
+      <!-- Estado -->
+      <div class="form-group">
+        <label for="evt-status">Estado de la Joda *</label>
+        <select id="evt-status" class="form-control" required>
+          <option value="preparando">PREPARANDO JODA</option>
+          <option value="tanda_1">ENTRADAS A LA VENTA · TANDA 1</option>
+          <option value="tanda_2">ENTRADAS A LA VENTA · TANDA 2</option>
+          <option value="ultima_tanda">ÚLTIMA TANDA</option>
+          <option value="agotado">AGOTADO</option>
+        </select>
+      </div>
+
+      <!-- Drive Fotos -->
+      <div class="form-group">
+        <label for="evt-drive-url">Link de Drive con Fotos (se carga semanas después)</label>
+        <input type="url" id="evt-drive-url" class="form-control" placeholder="https://drive.google.com/...">
+      </div>
+
+      <!-- Switch Publicada -->
+      <label class="switch-label">
+        <span>Publicada en la web</span>
+        <input type="checkbox" id="evt-published" class="switch-input" checked>
+      </label>
+
+      <!-- Vista previa en vivo -->
+      <div class="preview-box">
+        <div class="preview-badge-row">
+          <span style="font-size: 0.75rem; font-weight: 800; color: var(--red-bright);">VISTA PREVIA EN VIVO</span>
+          <span id="preview-status-badge" style="font-size: 0.75rem; font-weight: 700; color: var(--gray-light);">ESTADO</span>
+        </div>
+        <p id="preview-title" style="font-family: var(--font-display); font-size: 1.3rem; text-transform: uppercase;">Título de la joda</p>
+        <p id="preview-date" style="font-size: 0.85rem; color: var(--gray-light);">Fecha</p>
+        <p id="preview-dest" style="font-family: var(--font-mono); font-size: 0.85rem; color: #FFF; background: #222; padding: 2px 6px; border-radius: 2px; align-self: flex-start;"></p>
+      </div>
+
+      <!-- Botón Guardar -->
+      <button type="submit" class="btn btn-primary" id="btn-save-event" style="margin-top: 10px;">
+        <span class="spinner" id="event-spinner"></span>
+        <span id="event-save-text">Guardar Joda</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-msg" role="status">
+    <span id="toast-text">Mensaje</span>
+  </div>
+
+  <!-- LÓGICA DEL PANEL ADMIN -->
+  <script>
+    // ⚠️ COMPLETAR: Credenciales públicas de Supabase
+    const SUPABASE_URL = 'https://riwaytrjxkbpdkkpvxvx.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpd2F5dHJqeGticGRra3B2eHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MjUyODUsImV4cCI6MjEwODIwMTI4NX0.oMu0L2ADnT20BGDk1tIIacScvvxiNh3EP50SaA-aiAw';
+    const FINISH_AFTER_HOURS = 12;
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let allEvents = [];
+    let siteSettings = null;
+    let currentUser = null;
+
+    // Elementos DOM
+    const loginSection = document.getElementById('login-section');
+    const panelSection = document.getElementById('panel-section');
+    const loginForm = document.getElementById('login-form');
+    const btnLogout = document.getElementById('btn-logout');
+    const drawerEvent = document.getElementById('drawer-event');
+    const eventForm = document.getElementById('event-form');
+    const settingsForm = document.getElementById('settings-form');
+    const toast = document.getElementById('toast');
+
+    // Inicialización y Observador de Auth
+    document.addEventListener('DOMContentLoaded', async () => {
+      setupTabs();
+      setupLivePreview();
+      setupDrawerEvents();
+
+      // Verificar sesión existente
+      const { data: { session } } = await supabase.auth.getSession();
+      handleAuthState(session);
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        handleAuthState(session);
+      });
+    });
+
+    function handleAuthState(session) {
+      if (session && session.user) {
+        currentUser = session.user;
+        loginSection.classList.add('hidden');
+        panelSection.classList.remove('hidden');
+        loadAllAdminData();
+      } else {
+        currentUser = null;
+        loginSection.classList.remove('hidden');
+        panelSection.classList.add('hidden');
+      }
+    }
+
+    // 10.1 Login Form
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const spinner = document.getElementById('login-spinner');
+      const btnText = document.getElementById('login-btn-text');
+
+      spinner.style.display = 'inline-block';
+      btnText.textContent = 'Verificando...';
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        showToast('Sesión iniciada con éxito', 'success');
+      } catch (err) {
+        console.error('Error al iniciar sesión:', err);
+        showToast('Email o contraseña incorrectos', 'error');
+      } finally {
+        spinner.style.display = 'none';
+        btnText.textContent = 'Ingresar';
+      }
+    });
+
+    btnLogout.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      showToast('Sesión cerrada', 'success');
+    });
+
+    // Navegación por pestañas
+    function setupTabs() {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const target = btn.dataset.tab;
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+          document.getElementById(target)?.classList.remove('hidden');
+        });
+      });
+    }
+
+    // Toast de Feedback
+    let toastTimeout = null;
+    function showToast(text, type = 'success') {
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toast.className = `toast-msg toast-${type}`;
+      document.getElementById('toast-text').textContent = text;
+      toast.style.display = 'flex';
+      toastTimeout = setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3500);
+    }
+
+    // Validador de URL
+    function isValidUrl(str) {
+      if (!str) return true;
+      return /^https?:\/\//i.test(str.trim());
+    }
+
+    // Conversor de Fechas para Inputs (Horario Argentina UTC-3)
+    function isoToArgentinaInput(isoStr) {
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      // Extraer componentes en zona Argentina
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Argentina/Buenos_Aires',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+      const parts = formatter.formatToParts(d);
+      let y, m, day, h, min;
+      parts.forEach(p => {
+        if (p.type === 'year') y = p.value;
+        if (p.type === 'month') m = p.value;
+        if (p.type === 'day') day = p.value;
+        if (p.type === 'hour') h = p.value;
+        if (p.type === 'minute') min = p.value;
+      });
+      return `${y}-${m}-${day}T${h}:${min}`;
+    }
+
+    function argentinaInputToIso(inputStr) {
+      if (!inputStr) return null;
+      // Interpretar explícitamente como hora de Argentina (-03:00)
+      return new Date(`${inputStr}:00-03:00`).toISOString();
+    }
+
+    function formatDisplayDate(isoStr) {
+      if (!isoStr) return '';
+      try {
+        const d = new Date(isoStr);
+        return new Intl.DateTimeFormat('es-AR', {
+          timeZone: 'America/Argentina/Buenos_Aires',
+          weekday: 'short',
+          day: '2-digit',
+          month: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        }).format(d).toUpperCase();
+      } catch (_) {
+        return isoStr;
+      }
+    }
+
+    // Cargar todos los datos del panel
+    async function loadAllAdminData() {
+      await Promise.all([loadAdminEvents(), loadAdminSettings()]);
+    }
+
+    async function loadAdminEvents() {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true });
+
+      if (error) {
+        showToast('Error cargando jodas: ' + error.message, 'error');
+        return;
+      }
+
+      allEvents = data || [];
+      populateGroupsDatalist();
+      renderAdminLists();
+    }
+
+    function populateGroupsDatalist() {
+      const datalist = document.getElementById('groups-datalist');
+      datalist.textContent = '';
+      const groups = new Set();
+      allEvents.forEach(e => {
+        if (e.group_name && e.group_name.trim()) groups.add(e.group_name.trim());
+      });
+      groups.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        datalist.appendChild(opt);
+      });
+    }
+
+    function renderAdminLists() {
+      const listProximas = document.getElementById('list-proximas');
+      const listPasadas = document.getElementById('list-pasadas');
+      listProximas.textContent = '';
+      listPasadas.textContent = '';
+
+      const now = Date.now();
+      const finishWindowMs = FINISH_AFTER_HOURS * 3600 * 1000;
+
+      const proximas = [];
+      const pasadas = [];
+
+      allEvents.forEach(evt => {
+        const evtTime = new Date(evt.event_date).getTime();
+        if (now > (evtTime + finishWindowMs)) {
+          pasadas.push(evt);
+        } else {
+          proximas.push(evt);
+        }
+      });
+
+      // Pasadas más recientes primero
+      pasadas.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime());
+
+      if (proximas.length === 0) {
+        listProximas.innerHTML = '<p style="color: var(--gray-light); text-align: center; padding: 24px;">No hay jodas próximas cargadas.</p>';
+      } else {
+        proximas.forEach(evt => {
+          listProximas.appendChild(createAdminEventCard(evt, false));
+        });
+      }
+
+      if (pasadas.length === 0) {
+        listPasadas.innerHTML = '<p style="color: var(--gray-light); text-align: center; padding: 24px;">No hay jodas pasadas.</p>';
+      } else {
+        pasadas.forEach(evt => {
+          listPasadas.appendChild(createAdminEventCard(evt, true));
+        });
+      }
+    }
+
+    // Construcción DOM Segura de Card en el Panel Admin
+    function createAdminEventCard(evt, isPasada) {
+      const card = document.createElement('article');
+      card.className = `admin-event-card ${evt.published ? '' : 'is-unpublished'}`;
+
+      // Header: Thumb + Info
+      const header = document.createElement('div');
+      header.className = 'admin-card-header';
+
+      const thumb = document.createElement('img');
+      thumb.className = 'admin-card-thumb';
+      thumb.src = evt.flyer_url || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23222"/%3E%3Cpath d="M50 20L20 80H80Z" fill="%23444"/%3E%3C/svg%3E';
+      thumb.alt = 'Flyer';
+      thumb.loading = 'lazy';
+      header.appendChild(thumb);
+
+      const info = document.createElement('div');
+      info.className = 'admin-card-info';
+
+      const title = document.createElement('h3');
+      title.className = 'admin-card-title';
+      title.textContent = evt.title;
+      info.appendChild(title);
+
+      const meta = document.createElement('div');
+      meta.className = 'admin-card-meta';
+
+      const dateSpan = document.createElement('span');
+      dateSpan.textContent = formatDisplayDate(evt.event_date);
+      meta.appendChild(dateSpan);
+
+      if (evt.destination) {
+        const destBadge = document.createElement('span');
+        destBadge.className = 'badge-dest';
+        destBadge.textContent = evt.destination;
+        meta.appendChild(destBadge);
+      }
+
+      if (!evt.published) {
+        const draftBadge = document.createElement('span');
+        draftBadge.className = 'badge-draft';
+        draftBadge.textContent = 'Oculta';
+        meta.appendChild(draftBadge);
+      }
+
+      info.appendChild(meta);
+      header.appendChild(info);
+      card.appendChild(header);
+
+      // Si es pasada y NO tiene drive_url: Destacar falta de fotos (§10.2)
+      if (isPasada && (!evt.drive_url || evt.drive_url.trim() === '')) {
+        const missingBadge = document.createElement('div');
+        missingBadge.className = 'badge-missing-drive';
+        missingBadge.textContent = '⚠️ Falta subir fotos';
+        card.appendChild(missingBadge);
+
+        // Input rápido para pegar link de drive
+        const driveWrap = document.createElement('div');
+        driveWrap.className = 'quick-drive-wrap';
+
+        const driveInput = document.createElement('input');
+        driveInput.type = 'url';
+        driveInput.className = 'form-control quick-drive-input';
+        driveInput.placeholder = 'Pegar link de Drive aquí...';
+
+        const driveBtn = document.createElement('button');
+        driveBtn.type = 'button';
+        driveBtn.className = 'btn btn-primary quick-drive-btn';
+        driveBtn.textContent = 'Guardar';
+        driveBtn.addEventListener('click', async () => {
+          const val = driveInput.value.trim();
+          if (!val || !isValidUrl(val)) {
+            showToast('Ingresá un link de Drive válido (https://...)', 'error');
+            return;
+          }
+          await updateEventField(evt.id, { drive_url: val }, 'Link de Drive guardado');
+        });
+
+        driveWrap.appendChild(driveInput);
+        driveWrap.appendChild(driveBtn);
+        card.appendChild(driveWrap);
+      }
+
+      // Cambio rápido de estado directo en la lista (§10.2)
+      const statusWrap = document.createElement('div');
+      statusWrap.className = 'quick-status-wrap';
+
+      const statusLabel = document.createElement('span');
+      statusLabel.className = 'quick-status-label';
+      statusLabel.textContent = 'Estado:';
+      statusWrap.appendChild(statusLabel);
+
+      const statusSelect = document.createElement('select');
+      statusSelect.className = 'quick-status-select';
+      const options = [
+        { val: 'preparando', label: 'PREPARANDO JODA' },
+        { val: 'tanda_1', label: 'TANDA 1' },
+        { val: 'tanda_2', label: 'TANDA 2' },
+        { val: 'ultima_tanda', label: 'ÚLTIMA TANDA' },
+        { val: 'agotado', label: 'AGOTADO' }
+      ];
+      options.forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt.val;
+        o.textContent = opt.label;
+        if (evt.status === opt.val) o.selected = true;
+        statusSelect.appendChild(o);
+      });
+
+      statusSelect.addEventListener('change', async () => {
+        await updateEventField(evt.id, { status: statusSelect.value }, 'Estado actualizado');
+      });
+      statusWrap.appendChild(statusSelect);
+      card.appendChild(statusWrap);
+
+      // Botones de acción: Editar, Duplicar, Ocultar/Mostrar, Eliminar (§10.2)
+      const actions = document.createElement('div');
+      actions.className = 'admin-card-actions';
+
+      const btnEdit = document.createElement('button');
+      btnEdit.type = 'button';
+      btnEdit.className = 'btn-action';
+      btnEdit.textContent = 'Editar';
+      btnEdit.addEventListener('click', () => openEditEvent(evt));
+      actions.appendChild(btnEdit);
+
+      const btnDuplicate = document.createElement('button');
+      btnDuplicate.type = 'button';
+      btnDuplicate.className = 'btn-action';
+      btnDuplicate.textContent = 'Duplicar';
+      btnDuplicate.addEventListener('click', () => duplicateEvent(evt));
+      actions.appendChild(btnDuplicate);
+
+      const btnTogglePub = document.createElement('button');
+      btnTogglePub.type = 'button';
+      btnTogglePub.className = 'btn-action';
+      btnTogglePub.textContent = evt.published ? 'Ocultar' : 'Mostrar';
+      btnTogglePub.addEventListener('click', async () => {
+        await updateEventField(evt.id, { published: !evt.published }, evt.published ? 'Joda ocultada' : 'Joda publicada');
+      });
+      actions.appendChild(btnTogglePub);
+
+      const btnDelete = document.createElement('button');
+      btnDelete.type = 'button';
+      btnDelete.className = 'btn-action btn-del';
+      btnDelete.textContent = 'Eliminar';
+      btnDelete.addEventListener('click', () => confirmDeleteEvent(evt));
+      actions.appendChild(btnDelete);
+
+      card.appendChild(actions);
+      return card;
+    }
+
+    async function updateEventField(id, fields, successMsg) {
+      const { error } = await supabase
+        .from('events')
+        .update(fields)
+        .eq('id', id);
+
+      if (error) {
+        showToast('Error: ' + error.message, 'error');
+      } else {
+        showToast(successMsg, 'success');
+        await loadAdminEvents();
+      }
+    }
+
+    async function confirmDeleteEvent(evt) {
+      const confirmed = window.confirm(`¿Estás seguro de que querés ELIMINAR definitivamente la joda "${evt.title}"?\nEsta acción no se puede deshacer.`);
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', evt.id);
+
+      if (error) {
+        showToast('Error al eliminar: ' + error.message, 'error');
+      } else {
+        // Si tenía flyer en Supabase Storage, intentar limpiarlo
+        if (evt.flyer_url && evt.flyer_url.includes('alquimia-media')) {
+          deleteStorageFile(evt.flyer_url);
+        }
+        showToast('Joda eliminada', 'success');
+        await loadAdminEvents();
+      }
+    }
+
+    function duplicateEvent(evt) {
+      // Abre el formulario con los datos copiados, fecha vacía y estado preparando
+      document.getElementById('evt-id').value = '';
+      document.getElementById('evt-title').value = `${evt.title} (Copia)`;
+      document.getElementById('evt-group').value = evt.group_name || '';
+      document.getElementById('evt-date').value = '';
+      document.getElementById('evt-dest').value = evt.destination || '';
+      document.getElementById('evt-venue').value = evt.venue || '';
+      document.getElementById('evt-lineup').value = evt.lineup || '';
+      document.getElementById('evt-desc').value = evt.description || '';
+      document.getElementById('evt-ticket-url').value = evt.ticket_url || '';
+      document.getElementById('evt-ticket-label').value = evt.ticket_button_label || 'Conseguir entradas';
+      document.getElementById('evt-status').value = 'preparando';
+      document.getElementById('evt-drive-url').value = '';
+      document.getElementById('evt-published').checked = false; // Empezar oculta
+
+      document.getElementById('evt-flyer-url').value = evt.flyer_url || '';
+      const previewImg = document.getElementById('evt-flyer-preview');
+      if (evt.flyer_url) {
+        previewImg.src = evt.flyer_url;
+        previewImg.style.display = 'block';
+      } else {
+        previewImg.style.display = 'none';
+      }
+
+      document.getElementById('drawer-title').textContent = 'Duplicar Joda';
+      updateCharCounters();
+      updateLivePreview();
+      openDrawer();
+    }
+
+    // Modal Drawer Control
+    function setupDrawerEvents() {
+      document.getElementById('fab-new-event').addEventListener('click', () => {
+        openCreateEvent();
+      });
+
+      document.getElementById('btn-close-drawer').addEventListener('click', () => {
+        closeDrawer();
+      });
+    }
+
+    function openDrawer() {
+      drawerEvent.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      drawerEvent.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function openCreateEvent() {
+      eventForm.reset();
+      document.getElementById('evt-id').value = '';
+      document.getElementById('evt-flyer-url').value = '';
+      document.getElementById('evt-flyer-preview').style.display = 'none';
+      document.getElementById('drawer-title').textContent = 'Nueva Joda';
+      document.getElementById('evt-ticket-label').value = 'Conseguir entradas';
+      document.getElementById('evt-published').checked = true;
+      updateCharCounters();
+      updateLivePreview();
+      openDrawer();
+    }
+
+    function openEditEvent(evt) {
+      document.getElementById('evt-id').value = evt.id;
+      document.getElementById('evt-title').value = evt.title;
+      document.getElementById('evt-group').value = evt.group_name || '';
+      document.getElementById('evt-date').value = isoToArgentinaInput(evt.event_date);
+      document.getElementById('evt-dest').value = evt.destination || '';
+      document.getElementById('evt-venue').value = evt.venue || '';
+      document.getElementById('evt-lineup').value = evt.lineup || '';
+      document.getElementById('evt-desc').value = evt.description || '';
+      document.getElementById('evt-flyer-url').value = evt.flyer_url || '';
+      document.getElementById('evt-ticket-url').value = evt.ticket_url || '';
+      document.getElementById('evt-ticket-label').value = evt.ticket_button_label || 'Conseguir entradas';
+      document.getElementById('evt-status').value = evt.status || 'preparando';
+      document.getElementById('evt-drive-url').value = evt.drive_url || '';
+      document.getElementById('evt-published').checked = !!evt.published;
+
+      const previewImg = document.getElementById('evt-flyer-preview');
+      if (evt.flyer_url) {
+        previewImg.src = evt.flyer_url;
+        previewImg.style.display = 'block';
+      } else {
+        previewImg.style.display = 'none';
+      }
+
+      document.getElementById('drawer-title').textContent = 'Editar Joda';
+      updateCharCounters();
+      updateLivePreview();
+      openDrawer();
+    }
+
+    // Contadores de caracteres y Live Preview (§10.3)
+    function setupLivePreview() {
+      const destInput = document.getElementById('evt-dest');
+      const descInput = document.getElementById('evt-desc');
+      const titleInput = document.getElementById('evt-title');
+      const statusSelect = document.getElementById('evt-status');
+      const dateInput = document.getElementById('evt-date');
+
+      destInput.addEventListener('input', () => {
+        destInput.value = destInput.value.toUpperCase();
+        updateCharCounters();
+        updateLivePreview();
+      });
+
+      descInput.addEventListener('input', () => {
+        updateCharCounters();
+        updateLivePreview();
+      });
+
+      titleInput.addEventListener('input', updateLivePreview);
+      statusSelect.addEventListener('change', updateLivePreview);
+      dateInput.addEventListener('change', updateLivePreview);
+
+      // Previsualizar subida de flyer local
+      document.getElementById('evt-file-flyer').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const preview = document.getElementById('evt-flyer-preview');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+
+    function updateCharCounters() {
+      const dest = document.getElementById('evt-dest').value;
+      const desc = document.getElementById('evt-desc').value;
+      document.getElementById('count-dest').textContent = `${dest.length}/16`;
+      document.getElementById('count-desc').textContent = `${desc.length}/280`;
+    }
+
+    function updateLivePreview() {
+      const title = document.getElementById('evt-title').value.trim() || 'Título de la joda';
+      const dest = document.getElementById('evt-dest').value.trim();
+      const status = document.getElementById('evt-status').value;
+      const dateVal = document.getElementById('evt-date').value;
+
+      document.getElementById('preview-title').textContent = title;
+      document.getElementById('preview-status-badge').textContent = status.toUpperCase();
+      document.getElementById('preview-dest').textContent = dest ? `DESTINO: ${dest}` : 'SIN DESTINO';
+      document.getElementById('preview-date').textContent = dateVal ? `FECHA: ${dateVal.replace('T', ' ')} HS` : 'SIN FECHA';
+    }
+
+    // 10.5 Subida y Redimensionamiento en Cliente con Canvas
+    async function compressImage(file, maxDimension = 1600, quality = 0.85) {
+      if (!file.type.match(/^image\/(jpeg|png|webp)$/i)) {
+        throw new Error('Solo se permiten imágenes JPG, PNG o WEBP');
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        throw new Error('La imagen original no puede superar los 15 MB');
+      }
+
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error('Error al comprimir imagen'));
+            } else {
+              resolve(blob);
+            }
+          }, 'image/jpeg', quality);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadToStorage(blob, folder = 'flyers') {
+      const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.jpg`;
+      const { data, error } = await supabase.storage
+        .from('alquimia-media')
+        .upload(fileName, blob, {
+          contentType: 'image/jpeg',
+          upsert: false
+        });
+
+      if (error) throw error;
+
+      const { data: publicData } = supabase.storage
+        .from('alquimia-media')
+        .getPublicUrl(fileName);
+
+      return publicData.publicUrl;
+    }
+
+    async function deleteStorageFile(publicUrl) {
+      try {
+        if (!publicUrl || !publicUrl.includes('/alquimia-media/')) return;
+        const path = publicUrl.split('/alquimia-media/')[1];
+        if (path) {
+          await supabase.storage.from('alquimia-media').remove([path]);
+        }
+      } catch (err) {
+        console.warn('No se pudo borrar archivo viejo de storage:', err);
+      }
+    }
+
+    // Guardar Joda (Crear / Editar)
+    eventForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const spinner = document.getElementById('event-spinner');
+      const btnText = document.getElementById('event-save-text');
+      spinner.style.display = 'inline-block';
+      btnText.textContent = 'Guardando...';
+
+      try {
+        const id = document.getElementById('evt-id').value;
+        const title = document.getElementById('evt-title').value.trim();
+        const group_name = document.getElementById('evt-group').value.trim() || null;
+        const dateInput = document.getElementById('evt-date').value;
+        const destination = document.getElementById('evt-dest').value.trim().toUpperCase() || null;
+        const venue = document.getElementById('evt-venue').value.trim() || null;
+        const lineup = document.getElementById('evt-lineup').value.trim() || null;
+        const description = document.getElementById('evt-desc').value.trim() || null;
+        const ticket_url = document.getElementById('evt-ticket-url').value.trim() || null;
+        const ticket_button_label = document.getElementById('evt-ticket-label').value.trim() || 'Conseguir entradas';
+        const status = document.getElementById('evt-status').value;
+        const drive_url = document.getElementById('evt-drive-url').value.trim() || null;
+        const published = document.getElementById('evt-published').checked;
+
+        // Validaciones
+        if (!title) throw new Error('El título es obligatorio');
+        if (!dateInput) throw new Error('La fecha es obligatoria');
+        if (ticket_url && !isValidUrl(ticket_url)) throw new Error('El link de entradas debe empezar con https:// o http://');
+        if (drive_url && !isValidUrl(drive_url)) throw new Error('El link de Drive debe empezar con https:// o http://');
+
+        const event_date = argentinaInputToIso(dateInput);
+
+        // Subir flyer si se seleccionó uno nuevo
+        let flyer_url = document.getElementById('evt-flyer-url').value;
+        const fileInput = document.getElementById('evt-file-flyer');
+        if (fileInput.files && fileInput.files[0]) {
+          const compressedBlob = await compressImage(fileInput.files[0], 1600, 0.85);
+          const oldUrl = flyer_url;
+          flyer_url = await uploadToStorage(compressedBlob, 'flyers');
+          // Borrar flyer viejo si existía
+          if (oldUrl) deleteStorageFile(oldUrl);
+        }
+
+        const payload = {
+          title,
+          group_name,
+          event_date,
+          destination,
+          venue,
+          lineup,
+          description,
+          flyer_url,
+          ticket_url,
+          ticket_button_label,
+          status,
+          drive_url,
+          published
+        };
+
+        if (id) {
+          // Editar
+          const { error } = await supabase
+            .from('events')
+            .update(payload)
+            .eq('id', id);
+          if (error) throw error;
+          showToast('Joda actualizada correctamente', 'success');
+        } else {
+          // Crear
+          const { error } = await supabase
+            .from('events')
+            .insert([payload]);
+          if (error) throw error;
+          showToast('Joda creada correctamente', 'success');
+        }
+
+        closeDrawer();
+        await loadAdminEvents();
+      } catch (err) {
+        console.error('Error guardando joda:', err);
+        showToast(err.message, 'error');
+      } finally {
+        spinner.style.display = 'none';
+        btnText.textContent = 'Guardar Joda';
+      }
+    });
+
+    // 10.4 Ajustes Generales
+    async function loadAdminSettings() {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('Error cargando ajustes:', error);
+        return;
+      }
+
+      siteSettings = data || {};
+      document.getElementById('set-title').value = siteSettings.site_title || 'Fiesta Alquimia';
+      document.getElementById('set-tagline').value = siteSettings.tagline || 'Vivamos el momento, disfrutemos cada encuentro ;)';
+      document.getElementById('set-instagram').value = siteSettings.instagram_url || 'https://www.instagram.com/fiestaalquimia/';
+
+      if (siteSettings.logo_url) {
+        const logoPreview = document.getElementById('logo-preview-img');
+        logoPreview.src = siteSettings.logo_url;
+        document.getElementById('logo-preview-wrap').style.display = 'block';
+      }
+      if (siteSettings.background_url) {
+        const bgPreview = document.getElementById('bg-preview-img');
+        bgPreview.src = siteSettings.background_url;
+        document.getElementById('bg-preview-wrap').style.display = 'block';
+      }
+      if (siteSettings.og_image_url) {
+        const ogPreview = document.getElementById('og-preview-img');
+        ogPreview.src = siteSettings.og_image_url;
+        document.getElementById('og-preview-wrap').style.display = 'block';
+      }
+    }
+
+    document.getElementById('btn-remove-bg').addEventListener('click', async () => {
+      if (!confirm('¿Querés quitar la imagen de fondo y volver al fondo por defecto?')) return;
+      try {
+        if (siteSettings.background_url) {
+          deleteStorageFile(siteSettings.background_url);
+        }
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ background_url: null })
+          .eq('id', 1);
+
+        if (error) throw error;
+        document.getElementById('bg-preview-wrap').style.display = 'none';
+        siteSettings.background_url = null;
+        showToast('Fondo quitado correctamente', 'success');
+      } catch (err) {
+        showToast('Error al quitar fondo: ' + err.message, 'error');
+      }
+    });
+
+    settingsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const spinner = document.getElementById('settings-spinner');
+      spinner.style.display = 'inline-block';
+
+      try {
+        const site_title = document.getElementById('set-title').value.trim();
+        const tagline = document.getElementById('set-tagline').value.trim();
+        const instagram_url = document.getElementById('set-instagram').value.trim();
+
+        if (instagram_url && !isValidUrl(instagram_url)) {
+          throw new Error('La URL de Instagram debe empezar con https:// o http://');
+        }
+
+        let logo_url = siteSettings?.logo_url || null;
+        let background_url = siteSettings?.background_url || null;
+        let og_image_url = siteSettings?.og_image_url || null;
+
+        // Subir logo si se seleccionó
+        const logoFile = document.getElementById('file-logo').files[0];
+        if (logoFile) {
+          const blob = await compressImage(logoFile, 800, 0.9);
+          if (logo_url) deleteStorageFile(logo_url);
+          logo_url = await uploadToStorage(blob, 'logos');
+        }
+
+        // Subir fondo si se seleccionó
+        const bgFile = document.getElementById('file-bg').files[0];
+        if (bgFile) {
+          const blob = await compressImage(bgFile, 1600, 0.85);
+          if (background_url) deleteStorageFile(background_url);
+          background_url = await uploadToStorage(blob, 'backgrounds');
+        }
+
+        // Subir OG image si se seleccionó
+        const ogFile = document.getElementById('file-og').files[0];
+        if (ogFile) {
+          const blob = await compressImage(ogFile, 1200, 0.85);
+          if (og_image_url) deleteStorageFile(og_image_url);
+          og_image_url = await uploadToStorage(blob, 'og');
+        }
+
+        const { error } = await supabase
+          .from('site_settings')
+          .update({
+            site_title,
+            tagline,
+            instagram_url,
+            logo_url,
+            background_url,
+            og_image_url
+          })
+          .eq('id', 1);
+
+        if (error) throw error;
+
+        showToast('Ajustes guardados correctamente', 'success');
+        await loadAdminSettings();
+      } catch (err) {
+        console.error('Error guardando ajustes:', err);
+        showToast(err.message, 'error');
+      } finally {
+        spinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
