@@ -150,7 +150,7 @@ Logo chico, Instagram, `© {año} Fiesta Alquimia`.
 Tablero tipo _split-flap_ únicamente para `destination`.
 
 - Ancho fijo de **16 celdas** (el máximo de caracteres). Cada celda es un cuadradito oscuro con borde fino, letra blanca en tipografía monoespaciada/condensada, línea horizontal fina en el medio.
-- Al entrar la card en pantalla (`IntersectionObserver`, una sola vez), cada celda **gira** ciclando letras aleatorias (A-Z, 0-9) y se **fija de izquierda a derecha** con escalonado (~60-90 ms entre celdas, duración total ≤ 2,5 s). El destino queda "revelándose de a poco".
+- Al entrar la card en pantalla (`IntersectionObserver`, una sola vez), cada celda **gira** ciclando letras aleatorias (A-Z, 0-9) y se **fija de izquierda a derecha** con escalonado (~100 ms entre celdas, duración total ~3 s). El destino queda "revelándose de a poco".
 - Si hay varias cards, cada tablero arranca cuando su card es visible: el efecto se ve en cascada de forma natural.
 - Espacios del destino = celdas vacías. Si el destino tiene menos de 16 letras, centrarlo o alinearlo a la izquierda (elegir una y mantenerla), sin mostrar celdas vacías sobrantes si queda feo (se pueden mostrar solo las necesarias).
 - **Accesibilidad**: `aria-label="Destino: {destino}"` en el contenedor, celdas con `aria-hidden="true"`. Respetar `prefers-reduced-motion`: mostrar el destino final sin animación.

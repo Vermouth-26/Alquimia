@@ -1396,11 +1396,17 @@
 
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
+      // Duración total de la revelación: ~3 segundos
+      const STAGGER_MS = 100;
+      const FLIP_INTERVAL_MS = 75;
+      const MIN_FLIPS = 16;
+      const EXTRA_FLIPS = 6;
+
       cellElements.forEach((cell, idx) => {
         const finalChar = targetStr[idx] || ' ';
-        const delay = idx * 75; // Escalonado entre 60 y 90 ms
+        const delay = idx * STAGGER_MS;
         let flips = 0;
-        const maxFlips = 8 + Math.floor(Math.random() * 6);
+        const maxFlips = MIN_FLIPS + Math.floor(Math.random() * EXTRA_FLIPS);
 
         setTimeout(() => {
           const interval = setInterval(() => {
@@ -1412,7 +1418,7 @@
             } else {
               cell.textContent = chars[Math.floor(Math.random() * chars.length)];
             }
-          }, 45);
+          }, FLIP_INTERVAL_MS);
         }, delay);
       });
     }
