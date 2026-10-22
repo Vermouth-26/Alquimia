@@ -215,16 +215,25 @@
       color: var(--white);
     }
 
-    /* Grid de jodas */
+    /* Cards de jodas: centradas y se acomodan a los costados al sumar más */
     .events-grid {
-      display: grid;
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
       gap: 28px;
     }
 
+    .event-card,
+    .skeleton-card {
+      width: 100%;
+      flex: 0 1 100%;
+    }
+
     @media (min-width: 768px) {
-      .events-grid {
-        grid-template-columns: repeat(2, 1fr);
+      .event-card,
+      .skeleton-card {
+        flex: 0 1 calc(50% - 14px);
       }
     }
 
