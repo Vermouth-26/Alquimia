@@ -235,6 +235,19 @@
       background-repeat: no-repeat;
       background-position: right 14px center;
       padding-right: 36px;
+      color-scheme: dark;
+    }
+
+    /* El popup nativo del select hereda texto blanco sobre fondo blanco en Windows */
+    select.form-control option,
+    .quick-status-select option {
+      background-color: #111;
+      color: #fff;
+    }
+
+    input[type="date"].form-control,
+    input[type="time"].form-control {
+      color-scheme: dark;
     }
 
     /* Checkbox & Switch */
@@ -434,6 +447,7 @@
       width: 100%;
       cursor: pointer;
       text-transform: uppercase;
+      color-scheme: dark;
     }
     .quick-status-select:focus {
       outline: none;
@@ -788,8 +802,13 @@
 
       <!-- Fecha y Hora (Argentina) -->
       <div class="form-group">
-        <label for="evt-date">Fecha y Hora (Horario Argentina) *</label>
-        <input type="datetime-local" id="evt-date" class="form-control" required>
+        <label for="evt-date">Fecha (Horario Argentina) *</label>
+        <input type="date" id="evt-date" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <label for="evt-time">Hora (Horario Argentina) *</label>
+        <input type="time" id="evt-time" class="form-control" required value="00:00">
       </div>
 
       <!-- Destino (máx 16) -->
@@ -1021,10 +1040,10 @@
     }
 
     // Conversor de Fechas para Inputs (Horario Argentina UTC-3)
-    function isoToArgentinaInput(isoStr) {
-      if (!isoStr) return '';
+    function isoToArgentinaParts(isoStr) {
+      if (!isoStr) return { date: '', time: '00:00' };
       const d = new Date(isoStr);
-      // Extraer componentes en zona Argentina
+      // Extraer componentes en zona Argentina (hourCycle h23 evita "24:00")
       const formatter = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/Argentina/Buenos_Aires',
         year: 'numeric',
@@ -1032,24 +1051,24 @@
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hourCycle: 'h23'
       });
       const parts = formatter.formatToParts(d);
-      let y, m, day, h, min;
+      const values = {};
       parts.forEach(p => {
-        if (p.type === 'year') y = p.value;
-        if (p.type === 'month') m = p.value;
-        if (p.type === 'day') day = p.value;
-        if (p.type === 'hour') h = p.value;
-        if (p.type === 'minute') min = p.value;
+        values[p.type] = p.value;
       });
-      return `${y}-${m}-${day}T${h}:${min}`;
+      return {
+        date: `${values.year}-${values.month}-${values.day}`,
+        time: `${values.hour}:${values.minute}`
+      };
     }
 
-    function argentinaInputToIso(inputStr) {
-      if (!inputStr) return null;
+    function argentinaInputToIso(dateStr, timeStr) {
+      if (!dateStr || !timeStr) return null;
       // Interpretar explícitamente como hora de Argentina (-03:00)
-      return new Date(`${inputStr}:00-03:00`).toISOString();
+      const normalizedTime = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+      return new Date(`${dateStr}T${normalizedTime}-03:00`).toISOString();
     }
 
     function formatDisplayDate(isoStr) {
@@ -1348,6 +1367,7 @@
       document.getElementById('evt-title').value = `${evt.title} (Copia)`;
       document.getElementById('evt-group').value = evt.group_name || '';
       document.getElementById('evt-date').value = '';
+      document.getElementById('evt-time').value = '00:00';
       document.getElementById('evt-dest').value = evt.destination || '';
       document.getElementById('evt-venue').value = evt.venue || '';
       document.getElementById('evt-lineup').value = evt.lineup || '';
@@ -1411,7 +1431,9 @@
       document.getElementById('evt-id').value = evt.id;
       document.getElementById('evt-title').value = evt.title;
       document.getElementById('evt-group').value = evt.group_name || '';
-      document.getElementById('evt-date').value = isoToArgentinaInput(evt.event_date);
+      const eventDate = isoToArgentinaParts(evt.event_date);
+      document.getElementById('evt-date').value = eventDate.date;
+      document.getElementById('evt-time').value = eventDate.time;
       document.getElementById('evt-dest').value = evt.destination || '';
       document.getElementById('evt-venue').value = evt.venue || '';
       document.getElementById('evt-lineup').value = evt.lineup || '';
@@ -1444,6 +1466,7 @@
       const titleInput = document.getElementById('evt-title');
       const statusSelect = document.getElementById('evt-status');
       const dateInput = document.getElementById('evt-date');
+      const timeInput = document.getElementById('evt-time');
 
       destInput.addEventListener('input', () => {
         destInput.value = destInput.value.toUpperCase();
@@ -1459,6 +1482,8 @@
       titleInput.addEventListener('input', updateLivePreview);
       statusSelect.addEventListener('change', updateLivePreview);
       dateInput.addEventListener('change', updateLivePreview);
+      timeInput.addEventListener('change', updateLivePreview);
+      timeInput.addEventListener('input', updateLivePreview);
 
       // Previsualizar subida de flyer local
       document.getElementById('evt-file-flyer').addEventListener('change', function() {
@@ -1486,11 +1511,15 @@
       const dest = document.getElementById('evt-dest').value.trim();
       const status = document.getElementById('evt-status').value;
       const dateVal = document.getElementById('evt-date').value;
+      const timeVal = document.getElementById('evt-time').value;
 
       document.getElementById('preview-title').textContent = title;
       document.getElementById('preview-status-badge').textContent = status.toUpperCase();
       document.getElementById('preview-dest').textContent = dest ? `DESTINO: ${dest}` : 'SIN DESTINO';
-      document.getElementById('preview-date').textContent = dateVal ? `FECHA: ${dateVal.replace('T', ' ')} HS` : 'SIN FECHA';
+      const dateLabel = dateVal ? dateVal.split('-').reverse().join('/') : '';
+      document.getElementById('preview-date').textContent = (dateVal && timeVal)
+        ? `FECHA: ${dateLabel} ${timeVal} HS`
+        : 'SIN FECHA';
     }
 
     // 10.5 Subida y Redimensionamiento en Cliente con Canvas
@@ -1588,6 +1617,7 @@
         const title = document.getElementById('evt-title').value.trim();
         const group_name = document.getElementById('evt-group').value.trim() || null;
         const dateInput = document.getElementById('evt-date').value;
+        const timeInput = document.getElementById('evt-time').value;
         const destination = document.getElementById('evt-dest').value.trim().toUpperCase() || null;
         const venue = document.getElementById('evt-venue').value.trim() || null;
         const lineup = document.getElementById('evt-lineup').value.trim() || null;
@@ -1601,10 +1631,11 @@
         // Validaciones
         if (!title) throw new Error('El título es obligatorio');
         if (!dateInput) throw new Error('La fecha es obligatoria');
+        if (!timeInput) throw new Error('La hora es obligatoria');
         if (ticket_url && !isValidUrl(ticket_url)) throw new Error('El link de entradas debe empezar con https:// o http://');
         if (drive_url && !isValidUrl(drive_url)) throw new Error('El link de Drive debe empezar con https:// o http://');
 
-        const event_date = argentinaInputToIso(dateInput);
+        const event_date = argentinaInputToIso(dateInput, timeInput);
 
         // Subir flyer si se seleccionó uno nuevo
         let flyer_url = document.getElementById('evt-flyer-url').value;
