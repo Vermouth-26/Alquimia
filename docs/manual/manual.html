@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<title>Manual del usuario — Fiesta Alquimia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #121212;
+    --muted: #656565;
+    --soft: #f6f4f1;
+    --line: #e4e0da;
+    --red: #d32f2f;
+    --red-dark: #9e1414;
+    --orange: #ef6c00;
+    --green: #2e7d32;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #d9d6d1;
+    color: var(--ink);
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    font-size: 9.6pt;
+    line-height: 1.48;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    padding: 15mm 15mm 16mm;
+    background: #fff;
+    overflow: hidden;
+    page-break-after: always;
+    break-after: page;
+  }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    padding: 15mm 16mm 14mm;
+    background:
+      radial-gradient(circle at 85% 8%, rgba(211, 47, 47, .38), transparent 34%),
+      radial-gradient(circle at 10% 95%, rgba(211, 47, 47, .18), transparent 30%),
+      linear-gradient(145deg, #0b0b0b 0%, #141414 58%, #1d0909 100%);
+    color: #fff;
+  }
+  .cover .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 18mm 18mm;
+    pointer-events: none;
+  }
+  .cover .big-triangle {
+    position: absolute;
+    right: -42mm;
+    bottom: -48mm;
+    width: 155mm;
+    height: 155mm;
+    border: 1.2mm solid rgba(211,47,47,.30);
+    transform: rotate(45deg);
+    border-radius: 8mm;
+  }
+  .cover .big-triangle.two {
+    right: -20mm;
+    bottom: -76mm;
+    width: 118mm;
+    height: 118mm;
+    border-color: rgba(255,255,255,.10);
+  }
+  .cover-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 4mm;
+  }
+  .cover-mark {
+    width: 13mm;
+    height: 13mm;
+    color: var(--red);
+  }
+  .cover-mark svg { width: 100%; height: 100%; display: block; }
+  .cover-brand { font-family: "Anton", Impact, sans-serif; letter-spacing: .06em; font-size: 13pt; }
+  .cover-main {
+    position: relative;
+    z-index: 2;
+    margin-top: 45mm;
+  }
+  .cover-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 3mm;
+    font-size: 8.5pt;
+    font-weight: 800;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: #ff8f8f;
+  }
+  .cover-eyebrow::before {
+    content: "";
+    width: 12mm;
+    height: 1.3mm;
+    background: var(--red);
+    display: inline-block;
+  }
+  .cover h1 {
+    font-family: "Anton", Impact, sans-serif;
+    font-size: 47pt;
+    line-height: .97;
+    letter-spacing: .01em;
+    text-transform: uppercase;
+    margin: 6mm 0 6mm;
+    font-weight: 400;
+  }
+  .cover h1 span { color: #ff5a5a; }
+  .cover-sub {
+    max-width: 118mm;
+    font-size: 11.5pt;
+    line-height: 1.5;
+    color: #d6d1d0;
+  }
+  .cover-bottom {
+    position: absolute;
+    z-index: 2;
+    left: 16mm;
+    right: 16mm;
+    bottom: 15mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 5mm;
+    border-top: 1px solid rgba(255,255,255,.18);
+  }
+  .cover-url { font-size: 10pt; font-weight: 700; color: #fff; }
+  .cover-url small {
+    display: block;
+    font-size: 7pt;
+    font-weight: 600;
+    letter-spacing: .18em;
+    color: #9c9696;
+    text-transform: uppercase;
+    margin-bottom: 1.5mm;
+  }
+  .cover-edition { text-align: right; font-size: 7.5pt; letter-spacing: .15em; text-transform: uppercase; color: #9c9696; }
+  .cover-edition strong { display: block; font-size: 9pt; color: #ff8f8f; letter-spacing: .08em; margin-top: 1mm; }
+
+  /* ---------- HEADERS / FOOTERS ---------- */
+  .page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 3.5mm;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 7mm;
+  }
+  .ph-brand { display: flex; align-items: center; gap: 2.6mm; font-family: "Anton", Impact, sans-serif; font-size: 9pt; letter-spacing: .08em; }
+  .ph-brand svg { width: 6mm; height: 6mm; color: var(--red); }
+  .ph-section { font-size: 7pt; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #999; }
+  .page-foot {
+    position: absolute;
+    left: 15mm;
+    right: 15mm;
+    bottom: 8mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding-top: 2.5mm;
+    font-size: 6.8pt;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #a09b96;
+  }
+  .page-foot .dot { color: var(--red); font-weight: 800; }
+  .page-num { font-weight: 800; color: var(--ink); }
+
+  /* ---------- TYPOGRAPHY ---------- */
+  .kicker {
+    font-size: 7.2pt;
+    font-weight: 800;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 2mm;
+  }
+  h1.title {
+    font-family: "Anton", Impact, sans-serif;
+    font-size: 27pt;
+    line-height: 1;
+    text-transform: uppercase;
+    font-weight: 400;
+    letter-spacing: .01em;
+    margin: 0 0 3.5mm;
+  }
+  h1.title span { color: var(--red); }
+  .lead { font-size: 10.2pt; line-height: 1.55; color: #3f3f3f; max-width: 165mm; margin: 0 0 5mm; }
+  h2 {
+    font-family: "Anton", Impact, sans-serif;
+    font-size: 14pt;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    margin: 0 0 2.5mm;
+  }
+  h3 { font-size: 10pt; font-weight: 800; margin: 0 0 1.2mm; }
+  p { margin: 0 0 2.6mm; }
+  strong { font-weight: 700; }
+  .muted { color: var(--muted); }
+  .red { color: var(--red); }
+  .small { font-size: 8.2pt; }
+  .tiny { font-size: 7.4pt; line-height: 1.45; }
+
+  /* ---------- COMPONENTS ---------- */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
+  .four-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; }
+
+  .card {
+    background: var(--soft);
+    border: 1px solid var(--line);
+    border-radius: 2.5mm;
+    padding: 4.5mm;
+  }
+  .card h3 { display: flex; align-items: center; gap: 2.4mm; }
+  .mini-cards .card { padding: 3.2mm 3.6mm; }
+  .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 6mm;
+    height: 6mm;
+    border-radius: 50%;
+    background: var(--red);
+    color: #fff;
+    font-family: "Inter", sans-serif;
+    font-size: 7.6pt;
+    font-weight: 800;
+  }
+  .num.dark { background: var(--ink); }
+
+  .callout {
+    border-left: 1.6mm solid var(--red);
+    background: #fff7f7;
+    padding: 3.4mm 4mm;
+    border-radius: 0 2mm 2mm 0;
+    font-size: 8.7pt;
+    line-height: 1.5;
+    margin: 3mm 0;
+  }
+  .callout strong.label {
+    display: block;
+    font-size: 7pt;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1mm;
+  }
+  .callout.tip { border-left-color: var(--green); background: #f3f8f3; }
+  .callout.tip strong.label { color: var(--green); }
+  .callout.warn { border-left-color: var(--orange); background: #fff8f1; }
+  .callout.warn strong.label { color: var(--orange); }
+  .callout.dark { border-left-color: #fff; background: #151515; color: #e8e4e0; }
+  .callout.dark strong.label { color: #ff8f8f; }
+
+  .url-box {
+    background: #161616;
+    color: #fff;
+    border-radius: 2.5mm;
+    padding: 4mm 5mm;
+    display: flex;
+    align-items: center;
+    gap: 4mm;
+    margin: 3mm 0;
+  }
+  .url-box .icon {
+    width: 8mm; height: 8mm; border-radius: 50%;
+    background: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 9pt; flex: 0 0 auto;
+  }
+  .url-box .label { font-size: 6.6pt; letter-spacing: .16em; text-transform: uppercase; color: #a9a3a3; font-weight: 700; }
+  .url-box .value { font-size: 9.2pt; font-weight: 700; color: #fff; word-break: break-all; }
+
+  .steps { display: grid; gap: 3mm; }
+  .step {
+    display: flex;
+    gap: 3.2mm;
+    align-items: flex-start;
+    padding: 2.8mm 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .step:last-child { border-bottom: none; }
+  .step .num { margin-top: .2mm; }
+  .step h3 { margin-bottom: .6mm; }
+  .step p { margin: 0; font-size: 8.8pt; color: #4a4a4a; }
+
+  .shot {
+    margin: 0;
+    background: #101010;
+    border: 1px solid #2a2a2a;
+    border-radius: 2.6mm;
+    padding: 1.6mm;
+    box-shadow: 0 1.5mm 4mm rgba(0,0,0,.14);
+  }
+  .shot img { width: 100%; display: block; border-radius: 1.4mm; }
+  .shot.medium img { width: 96%; margin: 0 auto; }
+  .shot.small img { width: 88%; margin: 0 auto; }
+  .shot figcaption {
+    font-size: 6.9pt;
+    letter-spacing: .06em;
+    color: #b9b3b3;
+    padding: 1.6mm 1mm .8mm;
+    text-align: center;
+  }
+
+  .public-strip {
+    margin: 4mm 0 0;
+    border: 1px solid #2a2a2a;
+    background: #101010;
+    border-radius: 2.6mm;
+    padding: 1.6mm;
+    overflow: hidden;
+  }
+  .public-strip img {
+    width: 100%;
+    height: 47mm;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+    border-radius: 1.4mm;
+  }
+  .public-strip figcaption {
+    font-size: 6.9pt;
+    letter-spacing: .05em;
+    color: #b9b3b3;
+    padding: 1.6mm 1mm .8mm;
+    text-align: center;
+  }
+
+  .manual-key { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-top: 3mm; }
+  .key-item { display: flex; gap: 2.2mm; align-items: flex-start; }
+  .key-dot { width: 4mm; height: 4mm; border-radius: 50%; flex: 0 0 auto; margin-top: .8mm; }
+  .key-dot.red { background: var(--red); }
+  .key-dot.green { background: var(--green); }
+  .key-dot.black { background: #161616; }
+  .key-item h3 { font-size: 8pt; margin: 0 0 .3mm; }
+  .key-item p { font-size: 7.4pt; color: #666; margin: 0; line-height: 1.4; }
+
+  .checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.2mm 6mm;
+    margin-top: 2.5mm;
+  }
+  .check-item { display: flex; gap: 2.2mm; align-items: flex-start; font-size: 8.2pt; line-height: 1.4; }
+  .check-box {
+    width: 4mm; height: 4mm; border: .4mm solid var(--red);
+    border-radius: .8mm; flex: 0 0 auto; margin-top: .5mm;
+    position: relative;
+  }
+  .check-box::after {
+    content: "✓"; position: absolute; inset: -1.4mm 0 0 .2mm;
+    color: var(--red); font-size: 7pt; font-weight: 800;
+  }
+
+  .glossary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm 5mm; margin-top: 2mm; }
+  .glossary .g-item { border-top: .5mm solid var(--red); padding-top: 2mm; }
+  .glossary h3 { font-size: 8.2pt; margin: 0 0 .5mm; }
+  .glossary p { font-size: 7.4pt; color: #666; margin: 0; line-height: 1.4; }
+
+  .contact-lines { margin-top: 4mm; border: 1px solid var(--line); border-radius: 2.5mm; padding: 4mm 5mm; background: #faf9f7; }
+  .contact-lines h3 { font-family: "Anton", Impact, sans-serif; font-size: 11pt; font-weight: 400; text-transform: uppercase; margin: 0 0 2.5mm; }
+  .contact-line { display: flex; gap: 3mm; align-items: baseline; padding: 2mm 0; border-bottom: 1px solid #ddd8d2; font-size: 8.4pt; }
+  .contact-line:last-child { border-bottom: none; }
+  .contact-line span { width: 22mm; font-weight: 700; color: #555; flex: 0 0 auto; }
+  .contact-line i { flex: 1; border-bottom: 1px dotted #bdb6b0; height: 3mm; }
+
+  .badge {
+    display: inline-block;
+    font-size: 6.5pt;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .8mm 2mm;
+    border-radius: 1mm;
+    background: #eee;
+    color: #555;
+    vertical-align: middle;
+  }
+  .badge.new { background: var(--red); color: #fff; }
+  .badge.orange { background: #fff0e0; color: var(--orange); border: .3mm solid #ffc38c; }
+
+  .tbl { width: 100%; border-collapse: collapse; font-size: 8.1pt; line-height: 1.38; }
+  .tbl th {
+    background: #161616;
+    color: #fff;
+    text-align: left;
+    padding: 2.4mm 2.6mm;
+    font-size: 6.8pt;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 800;
+  }
+  .tbl td { padding: 2.1mm 2.6mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .tbl tr:nth-child(even) td { background: #faf9f7; }
+  .tbl .st { white-space: nowrap; font-weight: 800; font-size: 7.6pt; }
+  .pill {
+    display: inline-block;
+    padding: .9mm 2.2mm;
+    border-radius: 5mm;
+    font-size: 6.4pt;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .pill.preparando { background: #eee; color: #555; border: .3mm solid #ccc; }
+  .pill.tanda { background: #fdecec; color: #b71c1c; border: .3mm solid #ef9a9a; }
+  .pill.especial { background: #fff0e0; color: #c75b00; border: .3mm solid #ffb74d; }
+  .pill.ultima { background: var(--red); color: #fff; }
+  .pill.agotado { background: #222; color: #aaa; text-decoration: line-through; }
+
+  .flow {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 3mm;
+    align-items: stretch;
+    margin: 4mm 0;
+  }
+  .flow-step {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 1.4mm solid var(--red);
+    border-radius: 2mm;
+    padding: 3.4mm 3mm;
+    text-align: center;
+  }
+  .flow-step .fs-num {
+    width: 7mm; height: 7mm; border-radius: 50%;
+    background: #161616; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 2mm;
+    font-size: 8pt; font-weight: 800;
+  }
+  .flow-step h3 { font-size: 8pt; margin-bottom: 1mm; line-height: 1.25; }
+  .flow-step p { font-size: 7.2pt; color: #666; margin: 0; line-height: 1.4; }
+
+  .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .action {
+    border: 1px solid var(--line);
+    border-radius: 2.5mm;
+    padding: 4mm;
+    background: #fff;
+  }
+  .action .a-top { display: flex; align-items: center; gap: 2.5mm; margin-bottom: 1.6mm; }
+  .action .a-ico {
+    width: 8mm; height: 8mm; border-radius: 2mm;
+    background: #161616; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9pt; font-weight: 800;
+    flex: 0 0 auto;
+  }
+  .action h3 { margin: 0; font-size: 9.4pt; }
+  .action p { margin: 0; font-size: 8.3pt; color: #555; }
+
+  .index-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8mm; }
+  .index-row {
+    display: flex;
+    align-items: baseline;
+    gap: 2mm;
+    padding: 2.2mm 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 9pt;
+  }
+  .index-row .in { font-family: "Anton", Impact, sans-serif; color: var(--red); font-size: 10pt; width: 6mm; }
+  .index-row .it { flex: 1; font-weight: 600; }
+  .index-row .ip { font-weight: 800; color: #999; font-size: 8pt; }
+
+  .quickmap {
+    display: flex;
+    align-items: stretch;
+    background: #161616;
+    border-radius: 2.5mm;
+    overflow: hidden;
+    margin: 3mm 0 5mm;
+  }
+  .quickmap .qm {
+    flex: 1;
+    padding: 3.6mm 3mm;
+    color: #fff;
+    position: relative;
+    border-right: 1px solid rgba(255,255,255,.12);
+  }
+  .quickmap .qm:last-child { border-right: none; }
+  .quickmap .qm b { display: block; font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: #ff8f8f; margin-bottom: 1mm; }
+  .quickmap .qm span { font-size: 8.4pt; font-weight: 600; }
+
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 5mm; }
+  .field { display: flex; gap: 2.6mm; align-items: flex-start; }
+  .field .num { margin-top: .3mm; }
+  .field h3 { margin-bottom: .5mm; font-size: 8.9pt; }
+  .field p { margin: 0; font-size: 8pt; line-height: 1.42; color: #555; }
+
+  .spec-table { width: 100%; border-collapse: collapse; font-size: 7.9pt; }
+  .spec-table td { padding: 1.8mm 2.2mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .spec-table td:first-child { font-weight: 700; width: 38mm; color: #333; }
+  .spec-table tr:last-child td { border-bottom: none; }
+
+  .faq { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5mm 6mm; }
+  .qa h3 { font-size: 8.8pt; margin-bottom: .8mm; color: #161616; }
+  .qa p { font-size: 8pt; color: #555; margin: 0; line-height: 1.45; }
+
+  .qr-row { display: flex; gap: 6mm; align-items: center; }
+  .qr {
+    text-align: center;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 2.5mm;
+    padding: 3mm;
+    width: 38mm;
+  }
+  .qr img { width: 28mm; height: 28mm; display: block; margin: 0 auto 1.5mm; }
+  .qr span { font-size: 6.4pt; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #666; }
+
+  .final-box {
+    background: linear-gradient(135deg, #111 0%, #1d0909 100%);
+    color: #fff;
+    border-radius: 3mm;
+    padding: 6mm;
+    display: flex;
+    align-items: center;
+    gap: 6mm;
+    margin-top: 6mm;
+  }
+  .final-box svg { width: 18mm; height: 18mm; color: var(--red); flex: 0 0 auto; }
+  .final-box h2 { color: #fff; margin: 0 0 1.5mm; font-size: 16pt; }
+  .final-box p { color: #c9c4c1; font-size: 8.6pt; margin: 0; }
+
+  .page-cover-note { position: absolute; left: 15mm; right: 15mm; bottom: 16mm; }
+
+  .tight p:last-child { margin-bottom: 0; }
+  .mt-2 { margin-top: 2mm; }
+  .mt-3 { margin-top: 3mm; }
+  .mt-4 { margin-top: 4mm; }
+  .mb-0 { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<!-- ============================== 01 · PORTADA ============================== -->
+<section class="page cover">
+  <div class="grid-lines"></div>
+  <div class="big-triangle"></div>
+  <div class="big-triangle two"></div>
+
+  <div class="cover-top">
+    <div class="cover-mark">
+      <svg viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+        <line x1="27" y1="57" x2="73" y2="57" stroke="currentColor" stroke-width="3.4"/>
+        <polygon points="50,66 39,89 61,89" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="cover-brand">FIESTA ALQUIMIA</div>
+  </div>
+
+  <div class="cover-main">
+    <div class="cover-eyebrow">Manual del usuario</div>
+    <h1>Panel de<br><span>Administración</span></h1>
+    <p class="cover-sub">Guía práctica para gestionar fechas, tandas, flyers y fotos de la web, sin conocimientos técnicos.</p>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-url">
+      <small>Sitio web oficial</small>
+      fiestaalquimia.netlify.app
+    </div>
+    <div class="cover-edition">
+      Edición
+      <strong>Octubre 2026</strong>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 02 · BIENVENIDA ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">02 · Bienvenida</div>
+  </div>
+
+  <div class="kicker">Empecemos</div>
+  <h1 class="title">Tu web, <span>en tus manos</span></h1>
+  <p class="lead">Esta guía es para vos: la persona que va a administrar la web de Fiesta Alquimia. Acá vas a encontrar, paso a paso, todo lo necesario para publicar una fecha, cambiar la tanda, subir un flyer y mantener la página actualizada.</p>
+
+  <div class="quickmap">
+    <div class="qm"><b>01</b><span>Crear la joda</span></div>
+    <div class="qm"><b>02</b><span>Cargar flyer y link</span></div>
+    <div class="qm"><b>03</b><span>Elegir la tanda</span></div>
+    <div class="qm"><b>04</b><span>Publicar</span></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h2>¿Qué vas a poder hacer?</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <div><h3>Crear y editar fechas</h3><p>Agregar una joda nueva, cambiar la fecha, el lugar, el line-up o el flyer.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <div><h3>Manejar las tandas</h3><p>Pasar de “Preparando” a Tanda 1, 2, 3, 4, Especial, Última o Agotado.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <div><h3>Mostrar fotos</h3><p>Después de cada joda, pegar el link de Drive para que el público vea las fotos.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">4</div>
+          <div><h3>Cambiar la identidad</h3><p>Actualizar logo, fondo, Instagram y la frase de la web desde Ajustes.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2>Índice</h2>
+      <div class="index-list" style="grid-template-columns: 1fr;">
+        <div class="index-row"><span class="in">01</span><span class="it">Acceso al panel</span><span class="ip">03</span></div>
+        <div class="index-row"><span class="in">02</span><span class="it">Conociendo el panel</span><span class="ip">04</span></div>
+        <div class="index-row"><span class="in">03</span><span class="it">Crear una joda</span><span class="ip">05–06</span></div>
+        <div class="index-row"><span class="in">04</span><span class="it">Estados y tandas</span><span class="ip">07</span></div>
+        <div class="index-row"><span class="in">05</span><span class="it">Editar y organizar</span><span class="ip">08</span></div>
+        <div class="index-row"><span class="in">06</span><span class="it">Fotos de jodas pasadas</span><span class="ip">09</span></div>
+        <div class="index-row"><span class="in">07</span><span class="it">Ajustes de la web</span><span class="ip">10</span></div>
+        <div class="index-row"><span class="in">08</span><span class="it">Preguntas frecuentes</span><span class="ip">11</span></div>
+        <div class="index-row"><span class="in">09</span><span class="it">Soporte y contacto</span><span class="ip">12</span></div>
+      </div>
+
+      <div class="callout tip mt-3">
+        <strong class="label">Antes de empezar</strong>
+        Necesitás una compu o celular con internet, un navegador actualizado (Chrome, Edge o Safari) y el usuario y la contraseña que te entregaron. No hace falta instalar nada.
+      </div>
+    </div>
+  </div>
+
+  <div class="url-box">
+    <div class="icon">→</div>
+    <div>
+      <div class="label">Acceso directo al panel</div>
+      <div class="value">https://fiestaalquimia.netlify.app/admin.html</div>
+    </div>
+  </div>
+
+  <div class="manual-key">
+    <div class="key-item">
+      <span class="key-dot red"></span>
+      <div><h3>Rojo</h3><p>Botones, alertas y acciones importantes.</p></div>
+    </div>
+    <div class="key-item">
+      <span class="key-dot green"></span>
+      <div><h3>Verde</h3><p>Consejos y buenas prácticas.</p></div>
+    </div>
+    <div class="key-item">
+      <span class="key-dot black"></span>
+      <div><h3>Negro</h3><p>Datos clave y accesos directos.</p></div>
+    </div>
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">02</span></div>
+</section>
+
+<!-- ============================== 03 · ACCESO ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">03 · Acceso</div>
+  </div>
+
+  <div class="kicker">Primer paso</div>
+  <h1 class="title">Acceso al <span>panel</span></h1>
+  <p class="lead">El panel es privado. Solo vos podés entrar con tu usuario y contraseña. Desde ahí se administra todo lo que se ve en la web pública.</p>
+
+  <div class="two-col" style="grid-template-columns: 1.05fr .95fr; align-items: start;">
+    <div>
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <div>
+            <h3>Abrí el panel en el navegador</h3>
+            <p>Entrá a <strong>fiestaalquimia.netlify.app/admin.html</strong>. También podés guardarlo en favoritos o en la pantalla de inicio del celular.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <div>
+            <h3>Ingresá tus datos</h3>
+            <p>Escribí el correo y la contraseña que te entregaron. Tocá <strong>Ingresar</strong>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <div>
+            <h3>Listo, ya estás adentro</h3>
+            <p>Vas a ver las pestañas <strong>Próximas</strong>, <strong>Pasadas</strong> y <strong>Ajustes</strong>, y el botón rojo <strong>+ Nueva Joda</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn mt-3">
+        <strong class="label">Importante</strong>
+        No compartas tu contraseña. Si usás una compu compartida, tocá <strong>Cerrar sesión</strong> cuando termines.
+      </div>
+
+      <div class="callout tip">
+        <strong class="label">¿Olvidaste la contraseña?</strong>
+        No hay recuperación automática desde la web. Contactá a tu proveedor para que te genere una nueva.
+      </div>
+    </div>
+
+    <div>
+      <figure class="shot">
+        <img src="assets/admin-login.png" alt="Pantalla de acceso al panel de Fiesta Alquimia">
+        <figcaption>Pantalla de acceso al panel.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="url-box" style="margin-top: 5mm;">
+    <div class="icon">🔒</div>
+    <div>
+      <div class="label">Dirección del panel</div>
+      <div class="value">https://fiestaalquimia.netlify.app/admin.html</div>
+    </div>
+  </div>
+
+  <figure class="public-strip">
+    <img src="assets/public-events.png" alt="Sección de próximas jodas en la web pública">
+    <figcaption>La sección de próximas jodas, tal como la ve el público.</figcaption>
+  </figure>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">03</span></div>
+</section>
+
+<!-- ============================== 04 · PANEL ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">04 · El panel</div>
+  </div>
+
+  <div class="kicker">Vista general</div>
+  <h1 class="title">Conociendo <span>el panel</span></h1>
+  <p class="lead">Todo se organiza en tres pestañas. Cada tarjeta muestra la fecha, el destino y el estado actual de la joda.</p>
+
+  <figure class="shot">
+    <img src="assets/admin-panel.png" alt="Panel de administración con la lista de próximas jodas">
+    <figcaption>Pestaña “Próximas”: las fechas que todavía no pasaron.</figcaption>
+  </figure>
+
+  <div class="three-col mt-3">
+    <div class="card">
+      <h3><span class="num">1</span> Próximas</h3>
+      <p class="small mb-0">Las jodas que todavía no terminaron. Desde acá se crean, editan, cambian de tanda y se ocultan.</p>
+    </div>
+    <div class="card">
+      <h3><span class="num">2</span> Pasadas</h3>
+      <p class="small mb-0">Las jodas que ya terminaron. Se usan para cargar el link de Drive con las fotos.</p>
+    </div>
+    <div class="card">
+      <h3><span class="num">3</span> Ajustes</h3>
+      <p class="small mb-0">El logo, la imagen de fondo, el Instagram, la frase de la web y la imagen para compartir.</p>
+    </div>
+  </div>
+
+  <div class="two-col mt-3">
+    <div class="callout dark" style="margin: 0;">
+      <strong class="label">+ Nueva Joda</strong>
+      El botón rojo flotante, abajo a la derecha, abre el formulario para cargar una fecha nueva.
+    </div>
+    <div class="callout tip" style="margin: 0;">
+      <strong class="label">Se guarda solo</strong>
+      El selector de estado de cada tarjeta guarda el cambio al instante. En el formulario, en cambio, siempre tenés que tocar <strong>Guardar Joda</strong>.
+    </div>
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">04</span></div>
+</section>
+
+<!-- ============================== 05 · CREAR JODA I ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">05 · Crear una joda</div>
+  </div>
+
+  <div class="kicker">Paso a paso · 1 de 2</div>
+  <h1 class="title">Crear una <span>joda</span></h1>
+  <p class="lead">Tocá <strong>+ Nueva Joda</strong> y completá el formulario. Los campos con asterisco son obligatorios.</p>
+
+  <figure class="shot medium">
+    <img src="assets/admin-new-event.png" alt="Formulario para crear una nueva joda">
+    <figcaption>Parte superior del formulario: título, grupo, fecha, hora, destino y datos de la joda.</figcaption>
+  </figure>
+
+  <div class="field-grid mt-4">
+    <div class="field">
+      <div class="num">1</div>
+      <div>
+        <h3>Título de la Joda *</h3>
+        <p>El nombre que se ve grande en la tarjeta. Ejemplo: <strong>ALQUIMIA PINTO</strong>.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">2</div>
+      <div>
+        <h3>Grupo (opcional)</h3>
+        <p>Sirve para agrupar varias fechas bajo un mismo nombre. Ejemplo: <strong>CARNAVAL 2027</strong>.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">3</div>
+      <div>
+        <h3>Fecha y Hora *</h3>
+        <p>Se cargan por separado. La hora se interpreta en horario de Argentina. Revisá bien antes de publicar.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">4</div>
+      <div>
+        <h3>Destino *</h3>
+        <p>El pueblo o ciudad. Máximo <strong>16 caracteres</strong>; se muestra en el panel de letras de la web.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">5</div>
+      <div>
+        <h3>Lugar / Line-up / Descripción</h3>
+        <p>El boliche, los DJs (uno por línea) y un texto corto de hasta 280 caracteres.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">6</div>
+      <div>
+        <h3>Flyer</h3>
+        <p>La imagen principal de la tarjeta. Se sube desde el mismo formulario y se comprime sola.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn mt-3">
+    <strong class="label">Tip de fecha</strong>
+    Si cargás la fecha y la hora por separado, la web muestra la cuenta regresiva y el cartel <strong>ES HOY</strong> automáticamente. No hace falta que lo cambies a mano.
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">05</span></div>
+</section>
+
+<!-- ============================== 06 · CREAR JODA II ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">06 · Crear una joda</div>
+  </div>
+
+  <div class="kicker">Paso a paso · 2 de 2</div>
+  <h1 class="title">Entradas, estado <span>y publicación</span></h1>
+  <p class="lead">La parte de abajo del formulario define cómo se vende la joda y si ya se ve o no en la web.</p>
+
+  <figure class="shot small">
+    <img src="assets/admin-form-status.png" alt="Parte inferior del formulario con estado, link de Drive y publicación">
+    <figcaption>Estado, link de Drive, visibilidad y vista previa de la tarjeta.</figcaption>
+  </figure>
+
+  <div class="field-grid mt-4">
+    <div class="field">
+      <div class="num">7</div>
+      <div>
+        <h3>Link de entradas</h3>
+        <p>La URL de venta (por ejemplo, el link de la ticketera). Si está vacío, el botón no aparece en la web.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">8</div>
+      <div>
+        <h3>Texto del botón</h3>
+        <p>Lo que dice el botón. Por defecto: <strong>Conseguir entradas</strong>. Podés cambiarlo por “Comprar”, “Reservar”, etc.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">9</div>
+      <div>
+        <h3>Estado / Tanda</h3>
+        <p>Elegí la tanda actual. Así el público sabe si hay entradas y en qué etapa está la venta.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">10</div>
+      <div>
+        <h3>Link de Drive con fotos</h3>
+        <p>Se completa después de la joda. Mientras esté vacío, la web muestra “Revelando fotos…”.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">11</div>
+      <div>
+        <h3>Publicada</h3>
+        <p>Activada, la joda se ve en la web. Desactivada, queda guardada como borrador y no aparece.</p>
+      </div>
+    </div>
+    <div class="field">
+      <div class="num">12</div>
+      <div>
+        <h3>Guardar Joda</h3>
+        <p>Tocá <strong>Guardar Joda</strong> al terminar. Si cerraste sin guardar, los cambios no se aplican.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="three-col mini-cards mt-2">
+    <div class="card tight">
+      <h3>Flyer</h3>
+      <p class="tiny mb-0">JPG, PNG o WebP. Hasta 15 MB. Recomendado: vertical <strong>1080 × 1350 px</strong>. La web lo optimiza automáticamente.</p>
+    </div>
+    <div class="card tight">
+      <h3>Entradas</h3>
+      <p class="tiny mb-0">El botón solo se muestra si hay un link válido y la joda no está agotada ni en “Preparando”.</p>
+    </div>
+    <div class="card tight">
+      <h3>Borrador</h3>
+      <p class="tiny mb-0">Si todavía no querés que se vea, desactivá <strong>Publicada</strong>. Después la activás cuando esté todo listo.</p>
+    </div>
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">06</span></div>
+</section>
+
+<!-- ============================== 07 · TANDAS ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">07 · Estados y tandas</div>
+  </div>
+
+  <div class="kicker">La parte más importante</div>
+  <h1 class="title">Estados y <span>tandas</span></h1>
+  <p class="lead">El estado define el cartel que ve el público y si el botón de entradas está activo. Cambialo desde la tarjeta o desde el formulario.</p>
+
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th style="width: 30mm;">Estado</th>
+        <th style="width: 56mm;">Cuándo usarlo</th>
+        <th>Qué ve el público</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="st">Preparando</td>
+        <td>Cuando la fecha está confirmada pero las entradas todavía no salieron.</td>
+        <td><span class="pill preparando">Preparando joda</span><br><span class="tiny">Sin botón. Texto “Muy pronto entradas disponibles. Seguinos en Instagram”.</span></td>
+      </tr>
+      <tr>
+        <td class="st">Tanda 1</td>
+        <td>Primera tanda de venta.</td>
+        <td><span class="pill tanda">Entradas a la venta · Tanda 1</span><br><span class="tiny">Botón de entradas visible.</span></td>
+      </tr>
+      <tr>
+        <td class="st">Tanda 2</td>
+        <td>Cuando se agota la primera y abrís la segunda.</td>
+        <td><span class="pill tanda">Entradas a la venta · Tanda 2</span><br><span class="tiny">Botón visible.</span></td>
+      </tr>
+      <tr>
+        <td class="st">Tanda 3 <span class="badge new">Nueva</span></td>
+        <td>Tercera tanda, si la venta lo requiere.</td>
+        <td><span class="pill tanda">Entradas a la venta · Tanda 3</span><br><span class="tiny">Botón visible.</span></td>
+      </tr>
+      <tr>
+        <td class="st">Tanda 4 <span class="badge new">Nueva</span></td>
+        <td>Cuarta tanda, para estirar la venta un poco más.</td>
+        <td><span class="pill tanda">Entradas a la venta · Tanda 4</span><br><span class="tiny">Botón visible.</span></td>
+      </tr>
+      <tr>
+        <td class="st">Tanda especial <span class="badge new">Nueva</span></td>
+        <td>Para una tanda especial, limitada o con alguna promo puntual.</td>
+        <td><span class="pill especial">Entradas a la venta · Tanda especial</span><br><span class="tiny">Se destaca en naranja. Botón visible.</span></td>
+      </tr>
+      <tr>
+        <td class="st">Última tanda</td>
+        <td>Cuando quedan las últimas entradas.</td>
+        <td><span class="pill ultima">Última tanda</span><br><span class="tiny">Rojo intenso con pulso. Botón visible.</span></td>
+      </tr>
+      <tr>
+        <td class="st">Agotado</td>
+        <td>Cuando no quedan más entradas.</td>
+        <td><span class="pill agotado">Agotado</span><br><span class="tiny">La fecha sigue visible, pero el botón queda deshabilitado.</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="two-col mt-4">
+    <div class="callout" style="margin: 0;">
+      <strong class="label">Tanda especial</strong>
+      Es la única que se muestra en <strong>naranja</strong>. Úsala para una tirada corta, una preventa especial o una fecha conmemorativa. El resto de las tandas se ve en rojo.
+    </div>
+    <div class="callout tip" style="margin: 0;">
+      <strong class="label">Regla simple</strong>
+      Si hay entradas a la venta, elegí una tanda y cargá el link. Si no hay venta todavía, usá <strong>Preparando</strong>. Si se terminaron, usá <strong>Agotado</strong>.
+    </div>
+  </div>
+
+  <div class="callout warn mt-3">
+    <strong class="label">El botón de entradas</strong>
+    Solo aparece si cargaste un <strong>link válido</strong> en “Link de entradas”. Si el link está vacío, la tarjeta se muestra igual, pero sin botón.
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">07</span></div>
+</section>
+
+<!-- ============================== 08 · EDITAR ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">08 · Editar y organizar</div>
+  </div>
+
+  <div class="kicker">Mantenimiento</div>
+  <h1 class="title">Editar y <span>organizar</span></h1>
+  <p class="lead">Cada tarjeta tiene cuatro acciones. También podés cambiar la tanda sin abrir el formulario.</p>
+
+  <div class="action-grid">
+    <div class="action">
+      <div class="a-top"><div class="a-ico">✎</div><h3>Editar</h3></div>
+      <p>Abre el formulario con todos los datos cargados. Cambiá lo que necesites y tocá <strong>Guardar Joda</strong>.</p>
+    </div>
+    <div class="action">
+      <div class="a-top"><div class="a-ico">⧉</div><h3>Duplicar</h3></div>
+      <p>Copia la joda con el título terminado en “(Copia)”. Deja la fecha vacía, pone estado <strong>Preparando</strong> y la deja oculta. Ideal para cargar varias fechas parecidas.</p>
+    </div>
+    <div class="action">
+      <div class="a-top"><div class="a-ico">◐</div><h3>Ocultar / Mostrar</h3></div>
+      <p>La saca de la web sin borrarla. Usalo para borradores o para fechas que todavía no querés anunciar.</p>
+    </div>
+    <div class="action">
+      <div class="a-top"><div class="a-ico">✕</div><h3>Eliminar</h3></div>
+      <p>Borra la joda para siempre. La web pide confirmación antes de eliminarla. No se puede deshacer.</p>
+    </div>
+  </div>
+
+  <div class="callout dark mt-4">
+    <strong class="label">Cambio rápido de tanda</strong>
+    En cada tarjeta, debajo de la fecha, hay un selector de <strong>Estado</strong>. Elegí la tanda y se guarda al instante. No hace falta abrir el formulario ni tocar “Guardar Joda”.
+  </div>
+
+  <div class="two-col mt-4">
+    <div>
+      <h2>¿Cuándo duplicar?</h2>
+      <p class="small">Cuando hay varias fechas del mismo grupo, por ejemplo un carnaval con dos noches. Duplicás la primera, cambiás la fecha y el título, y ya queda creada la segunda. Acordate de revisar el flyer y el link de entradas.</p>
+      <div class="callout tip" style="margin-bottom: 0;">
+        <strong class="label">Tip</strong>
+        Después de duplicar, la copia queda oculta. Cambiale la fecha y activá <strong>Publicada</strong> cuando esté lista.
+      </div>
+    </div>
+    <div>
+      <h2>¿Ocultar o eliminar?</h2>
+      <p class="small"><strong>Ocultar</strong> es temporal: la joda sigue guardada y la podés volver a mostrar. <strong>Eliminar</strong> es definitivo: se borran los datos y el flyer de la web.</p>
+      <div class="callout warn" style="margin-bottom: 0;">
+        <strong class="label">Antes de eliminar</strong>
+        Si solo querés que no se vea, usá <strong>Ocultar</strong>. Guardá <strong>Eliminar</strong> para cuando estés seguro de que esa fecha no vuelve.
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-3" style="border-top: 1.4mm solid var(--red);">
+    <h2 style="margin-bottom: 1mm;">Checklist antes de publicar</h2>
+    <div class="checklist">
+      <div class="check-item"><span class="check-box"></span><span>Título y grupo correctos.</span></div>
+      <div class="check-item"><span class="check-box"></span><span>Fecha y hora revisadas.</span></div>
+      <div class="check-item"><span class="check-box"></span><span>Flyer cargado y visible.</span></div>
+      <div class="check-item"><span class="check-box"></span><span>Link de entradas probado.</span></div>
+      <div class="check-item"><span class="check-box"></span><span>Tanda seleccionada.</span></div>
+      <div class="check-item"><span class="check-box"></span><span>Publicada activada.</span></div>
+    </div>
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">08</span></div>
+</section>
+
+<!-- ============================== 09 · FOTOS ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">09 · Fotos de jodas pasadas</div>
+  </div>
+
+  <div class="kicker">Después de la fiesta</div>
+  <h1 class="title">Fotos de <span>jodas pasadas</span></h1>
+  <p class="lead">Cuando una joda termina, la web la mueve automáticamente a la sección de fotos. Vos solo tenés que pegar el link de Drive cuando estén listas.</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="fs-num">1</div>
+      <h3>Termina la joda</h3>
+      <p>La fecha deja de mostrarse en “Próximas”.</p>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">2</div>
+      <h3>Pasa a “Pasadas”</h3>
+      <p>La web la muestra en la sección de fotos con el cartel “Revelando fotos…”.</p>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">3</div>
+      <h3>Pegás el link</h3>
+      <p>En la tarjeta de “Pasadas”, pegás el link de Drive y tocás <strong>Guardar</strong>.</p>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">4</div>
+      <h3>Fotos listas</h3>
+      <p>La web muestra el botón <strong>Ver fotos</strong> y deja de mostrar “Revelando”.</p>
+    </div>
+  </div>
+
+  <div class="two-col mt-4" style="align-items: start;">
+    <div>
+      <h2>Cómo cargar el link</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <div><h3>Entrá a la pestaña “Pasadas”</h3><p>Buscá la joda que ya terminó. Si no tiene fotos, va a mostrar el cartel <strong>⚠️ Falta subir fotos</strong>.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <div><h3>Pegá el link de Drive</h3><p>Copiá el enlace de la carpeta de Google Drive y pegalo en el campo <strong>Pegar link de Drive aquí…</strong>.</p></div>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <div><h3>Tocá “Guardar”</h3><p>El cambio se aplica al instante. La web pública ya muestra el botón <strong>Ver fotos</strong>.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="callout warn">
+        <strong class="label">Muy importante</strong>
+        La web <strong>no sube las fotos</strong> a su propio servidor. Solo muestra el link a tu carpeta de Drive. Asegurate de que la carpeta tenga permiso de lectura para cualquier persona con el enlace.
+      </div>
+      <div class="callout tip">
+        <strong class="label">¿Todavía no están las fotos?</strong>
+        Dejá el campo vacío. La web muestra “Revelando fotos…” con la cantidad de días desde la joda. Cuando el fotógrafo te pase el link, lo cargás.
+      </div>
+      <div class="card tight">
+        <h3>Un link por joda</h3>
+        <p class="tiny mb-0">Si tenés varias carpetas (por ejemplo, Fotos y Aftermovie), armá una carpeta principal que las contenga y compartí ese link.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-3">
+    <h2 style="margin-bottom: .5mm;">Compartir la carpeta de Drive</h2>
+    <div class="three-col" style="margin-top: 1mm;">
+      <div>
+        <h3><span class="num">1</span> Abrí la carpeta</h3>
+        <p class="small mb-0">En Google Drive, tocá los tres puntos de la carpeta y elegí <strong>Compartir</strong>.</p>
+      </div>
+      <div>
+        <h3><span class="num">2</span> Cambiá el acceso</h3>
+        <p class="small mb-0">En “Acceso general”, elegí <strong>Cualquier persona con el enlace</strong> y permiso de lectura.</p>
+      </div>
+      <div>
+        <h3><span class="num">3</span> Copiá el enlace</h3>
+        <p class="small mb-0">Tocá <strong>Copiar enlace</strong> y pegalo en el campo de la joda. Guardá.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">09</span></div>
+</section>
+
+<!-- ============================== 10 · AJUSTES ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">10 · Ajustes de la web</div>
+  </div>
+
+  <div class="kicker">Identidad</div>
+  <h1 class="title">Ajustes de <span>la web</span></h1>
+  <p class="lead">Desde la pestaña <strong>Ajustes</strong> podés cambiar la identidad visual y los datos generales. Los cambios se ven en la web apenas los guardás.</p>
+
+  <figure class="shot" style="width: 136mm; margin: 0 auto;">
+    <img src="assets/admin-settings-crop.png" alt="Pestaña de ajustes de la web">
+    <figcaption>Pestaña “Ajustes”: textos, Instagram, logo, fondo e imagen para compartir.</figcaption>
+  </figure>
+
+  <div class="two-col mt-2" style="align-items: start;">
+    <div>
+      <h2>Qué podés cambiar</h2>
+      <div class="field-grid" style="grid-template-columns: 1fr;">
+        <div class="field">
+          <div class="num">1</div>
+          <div><h3>Título de la Web</h3><p>El nombre principal. Por defecto: <strong>FIESTA ALQUIMIA</strong>.</p></div>
+        </div>
+        <div class="field">
+          <div class="num">2</div>
+          <div><h3>Lema / Frase</h3><p>La frase que aparece debajo del título. Ejemplo: “Vivamos el momento, disfrutemos cada encuentro ;)”.</p></div>
+        </div>
+        <div class="field">
+          <div class="num">3</div>
+          <div><h3>URL de Instagram</h3><p>El link completo al perfil. Se usa en el botón de Instagram de la web.</p></div>
+        </div>
+        <div class="field">
+          <div class="num">4</div>
+          <div><h3>Imágenes</h3><p>Logo, fondo de pantalla e imagen para compartir. Se suben desde el mismo panel.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2>Medidas recomendadas</h2>
+      <table class="spec-table">
+        <tr><td>Logo</td><td>PNG o SVG con fondo transparente. Alto mínimo: 400 px.</td></tr>
+        <tr><td>Fondo</td><td>JPG o PNG horizontal, 1920 × 1080 px. Que no compita con el texto.</td></tr>
+        <tr><td>Imagen para compartir</td><td>JPG o PNG de 1200 × 630 px. Es la que aparece en WhatsApp y redes.</td></tr>
+        <tr><td>Peso máximo</td><td>15 MB por imagen. La web las optimiza sola.</td></tr>
+      </table>
+      <div class="callout tip mt-2" style="margin-bottom: 0;">
+        <strong class="label">Después de cambiar</strong>
+        Tocá <strong>Guardar Ajustes</strong>. Si no ves el cambio, recargá la web pública con <strong>Ctrl + F5</strong>.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn mt-2">
+    <strong class="label">Cuidado con el fondo</strong>
+    Usá una imagen oscura o con poca información: el texto de la web es blanco y necesita contraste para leerse bien.
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">10</span></div>
+</section>
+
+<!-- ============================== 11 · FAQ ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">11 · Preguntas frecuentes</div>
+  </div>
+
+  <div class="kicker">Para salir de dudas</div>
+  <h1 class="title">Preguntas <span>frecuentes</span></h1>
+  <p class="lead">Las dudas más comunes al administrar la web. Si no encontrás la respuesta, contactá a tu proveedor.</p>
+
+  <div class="faq">
+    <div class="qa"><h3>No veo mi joda en la web</h3><p>Revisá que <strong>Publicada</strong> esté activada y que la fecha sea futura. Si acaba de terminar, pasó a “Pasadas”.</p></div>
+    <div class="qa"><h3>La fecha se guardó mal</h3><p>La fecha y la hora se cargan en campos separados. Editá la joda y revisá ambos. La hora se toma en horario de Argentina.</p></div>
+    <div class="qa"><h3>Cambié la tanda y no se ve</h3><p>El cambio se guarda al instante. Recargá la web pública con <strong>Ctrl + F5</strong> para ver la versión actualizada.</p></div>
+    <div class="qa"><h3>¿Puedo publicar sin link de entradas?</h3><p>Sí. Dejá el link vacío y usá el estado <strong>Preparando</strong>. La tarjeta se ve, pero sin botón de compra.</p></div>
+    <div class="qa"><h3>¿Cómo cambio el flyer?</h3><p>Entrá a <strong>Editar</strong>, subí una imagen nueva y guardá. La anterior se reemplaza automáticamente.</p></div>
+    <div class="qa"><h3>¿Puedo cargar dos fechas del mismo grupo?</h3><p>Sí. Usá el mismo nombre en <strong>Grupo</strong> para las dos. La web las agrupa bajo un mismo título.</p></div>
+    <div class="qa"><h3>¿Las fotos se suben a la web?</h3><p>No. La web solo enlaza a tu carpeta de Google Drive. Las fotos quedan alojadas en tu Drive.</p></div>
+    <div class="qa"><h3>¿Qué pasa si elimino una joda?</h3><p>Se borra para siempre, junto con su flyer. Si solo querés ocultarla, usá <strong>Ocultar</strong>.</p></div>
+    <div class="qa"><h3>¿Puedo cambiar el orden de las fechas?</h3><p>No hace falta: la web ordena sola por fecha y muestra primero las más próximas.</p></div>
+    <div class="qa"><h3>¿Se puede usar desde el celular?</h3><p>Sí. El panel funciona en el navegador del celular. Para editar textos largos, una compu es más cómoda.</p></div>
+  </div>
+
+  <div class="two-col mt-4">
+    <div class="callout dark" style="margin: 0;">
+      <strong class="label">Buenas prácticas</strong>
+      Cargá el flyer antes de publicar. Revisá fecha y hora dos veces. No compartas tu contraseña. Cerrá sesión en compus compartidas. Guardá una copia de los flyers originales.
+    </div>
+    <div class="callout tip" style="margin: 0;">
+      <strong class="label">Si algo no funciona</strong>
+      Primero recargá la página con <strong>Ctrl + F5</strong>. Si el problema sigue, sacá una captura de pantalla y enviásela a tu proveedor con el detalle de lo que estabas haciendo.
+    </div>
+  </div>
+
+  <h2 class="mt-4">Glosario</h2>
+  <div class="glossary">
+    <div class="g-item"><h3>Joda</h3><p>Una fecha o evento de Fiesta Alquimia.</p></div>
+    <div class="g-item"><h3>Tanda</h3><p>Etapa de venta de entradas: 1, 2, 3, 4, especial o última.</p></div>
+    <div class="g-item"><h3>Flyer</h3><p>La imagen principal que se ve en la tarjeta de la joda.</p></div>
+    <div class="g-item"><h3>Line-up</h3><p>Los DJs o artistas que tocan en la fecha.</p></div>
+    <div class="g-item"><h3>Imagen OG</h3><p>La imagen que aparece al compartir la web por WhatsApp o redes.</p></div>
+    <div class="g-item"><h3>Drive</h3><p>Google Drive, donde guardás las fotos de cada joda.</p></div>
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">11</span></div>
+</section>
+
+<!-- ============================== 12 · SOPORTE ============================== -->
+<section class="page">
+  <div class="page-head">
+    <div class="ph-brand">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="6"/><polygon points="50,66 39,89 61,89" fill="currentColor"/></svg>
+      FIESTA ALQUIMIA
+    </div>
+    <div class="ph-section">12 · Soporte y contacto</div>
+  </div>
+
+  <div class="kicker">Estamos para ayudarte</div>
+  <h1 class="title">Soporte y <span>contacto</span></h1>
+  <p class="lead">Guardá este manual y los accesos. Ante cualquier duda técnica, contactá a tu proveedor con el detalle de lo que necesitás.</p>
+
+  <div class="two-col" style="align-items: start;">
+    <div>
+      <h2>Accesos rápidos</h2>
+      <div class="url-box" style="margin-top: 2mm;">
+        <div class="icon">W</div>
+        <div>
+          <div class="label">Web pública</div>
+          <div class="value">fiestaalquimia.netlify.app</div>
+        </div>
+      </div>
+      <div class="url-box" style="margin-top: 2mm;">
+        <div class="icon">A</div>
+        <div>
+          <div class="label">Panel de administración</div>
+          <div class="value">fiestaalquimia.netlify.app/admin.html</div>
+        </div>
+      </div>
+
+      <div class="callout mt-3">
+        <strong class="label">Soporte</strong>
+        Contactá a la persona que te entregó la página. Tené a mano el link de la joda y una captura de pantalla del problema para resolverlo más rápido.
+      </div>
+    </div>
+
+    <div>
+      <h2>Escaneá y entrá</h2>
+      <div class="qr-row">
+        <div class="qr">
+          <img src="assets/qr-web.png" alt="Código QR de la web pública">
+          <span>Web pública</span>
+        </div>
+        <div class="qr">
+          <img src="assets/qr-admin.png" alt="Código QR del panel de administración">
+          <span>Panel admin</span>
+        </div>
+      </div>
+      <p class="tiny muted mt-2">Apuntá la cámara del celular al código para abrir la dirección.</p>
+    </div>
+  </div>
+
+  <div class="final-box">
+    <svg viewBox="0 0 100 100" fill="none" aria-hidden="true">
+      <path d="M50 9L15 89H85L50 9Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/>
+      <line x1="27" y1="57" x2="73" y2="57" stroke="currentColor" stroke-width="3.4"/>
+      <polygon points="50,66 39,89 61,89" fill="currentColor"/>
+    </svg>
+    <div>
+      <h2>Fiesta Alquimia</h2>
+      <p>Vivamos el momento, disfrutemos cada encuentro ;)<br>Manual del usuario · Edición Octubre 2026</p>
+    </div>
+  </div>
+
+  <div class="callout warn mt-3">
+    <strong class="label">Licencia de uso</strong>
+    Este manual y la página se entregan para uso exclusivo del cliente. No está permitida la copia, reventa o modificación no autorizada. El precio, la forma de pago y el soporte incluido se detallan en el acuerdo comercial correspondiente.
+  </div>
+
+  <div class="contact-lines">
+    <h3>Datos de soporte</h3>
+    <p class="tiny muted" style="margin-bottom: 1.5mm;">Anotá acá los datos de tu proveedor para tenerlos a mano.</p>
+    <div class="contact-line"><span>Nombre</span><i></i></div>
+    <div class="contact-line"><span>WhatsApp</span><i></i></div>
+    <div class="contact-line"><span>Email</span><i></i></div>
+  </div>
+
+  <div class="page-foot"><span>Manual del usuario <span class="dot">·</span> Fiesta Alquimia</span><span class="page-num">12</span></div>
+</section>
+
+<script>
+  // Vista previa de una sola página: manual.html?page=N
+  (function () {
+    var page = parseInt(new URLSearchParams(location.search).get('page') || '0', 10);
+    if (page > 0) {
+      document.querySelectorAll('.page').forEach(function (p, i) {
+        if (i + 1 !== page) p.style.display = 'none';
+      });
+      document.body.style.background = '#fff';
+    }
+  })();
+</script>
+</body>
+</html>
