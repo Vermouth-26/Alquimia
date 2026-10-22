@@ -458,10 +458,20 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .status-tanda_1, .status-tanda_2 {
+    .status-tanda_1,
+    .status-tanda_2,
+    .status-tanda_3,
+    .status-tanda_4,
+    .status-tanda_especial {
       background-color: rgba(211, 47, 47, 0.2);
       color: #FF6B6B;
       border: 1px solid var(--red-main);
+    }
+
+    .status-tanda_especial {
+      background-color: rgba(255, 152, 0, 0.18);
+      color: #FFB74D;
+      border: 1px solid #FF9800;
     }
 
     .status-ultima_tanda {
@@ -1223,6 +1233,15 @@
           case 'tanda_2':
             badge.textContent = 'ENTRADAS A LA VENTA · TANDA 2';
             break;
+          case 'tanda_3':
+            badge.textContent = 'ENTRADAS A LA VENTA · TANDA 3';
+            break;
+          case 'tanda_4':
+            badge.textContent = 'ENTRADAS A LA VENTA · TANDA 4';
+            break;
+          case 'tanda_especial':
+            badge.textContent = 'ENTRADAS A LA VENTA · TANDA ESPECIAL';
+            break;
           case 'ultima_tanda':
             badge.textContent = 'ÚLTIMA TANDA';
             break;
@@ -1321,7 +1340,7 @@
         btnDisabled.disabled = true;
         btnDisabled.textContent = 'Agotado';
         actions.appendChild(btnDisabled);
-      } else if (['tanda_1', 'tanda_2', 'ultima_tanda'].includes(evt.status)) {
+      } else if (['tanda_1', 'tanda_2', 'tanda_3', 'tanda_4', 'tanda_especial', 'ultima_tanda'].includes(evt.status)) {
         if (validTicketUrl) {
           const btnTicket = document.createElement('a');
           btnTicket.className = 'btn btn-ticket';

@@ -867,6 +867,9 @@
           <option value="preparando">PREPARANDO JODA</option>
           <option value="tanda_1">ENTRADAS A LA VENTA · TANDA 1</option>
           <option value="tanda_2">ENTRADAS A LA VENTA · TANDA 2</option>
+          <option value="tanda_3">ENTRADAS A LA VENTA · TANDA 3</option>
+          <option value="tanda_4">ENTRADAS A LA VENTA · TANDA 4</option>
+          <option value="tanda_especial">ENTRADAS A LA VENTA · TANDA ESPECIAL</option>
           <option value="ultima_tanda">ÚLTIMA TANDA</option>
           <option value="agotado">AGOTADO</option>
         </select>
@@ -914,6 +917,17 @@
     const SUPABASE_URL = 'https://riwaytrjxkbpdkkpvxvx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpd2F5dHJqeGticGRra3B2eHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MjUyODUsImV4cCI6MjEwODIwMTI4NX0.oMu0L2ADnT20BGDk1tIIacScvvxiNh3EP50SaA-aiAw';
     const FINISH_AFTER_HOURS = 12;
+
+    const STATUS_LABELS = {
+      preparando: 'PREPARANDO JODA',
+      tanda_1: 'ENTRADAS A LA VENTA · TANDA 1',
+      tanda_2: 'ENTRADAS A LA VENTA · TANDA 2',
+      tanda_3: 'ENTRADAS A LA VENTA · TANDA 3',
+      tanda_4: 'ENTRADAS A LA VENTA · TANDA 4',
+      tanda_especial: 'ENTRADAS A LA VENTA · TANDA ESPECIAL',
+      ultima_tanda: 'ÚLTIMA TANDA',
+      agotado: 'AGOTADO'
+    };
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1271,6 +1285,9 @@
         { val: 'preparando', label: 'PREPARANDO JODA' },
         { val: 'tanda_1', label: 'TANDA 1' },
         { val: 'tanda_2', label: 'TANDA 2' },
+        { val: 'tanda_3', label: 'TANDA 3' },
+        { val: 'tanda_4', label: 'TANDA 4' },
+        { val: 'tanda_especial', label: 'TANDA ESPECIAL' },
         { val: 'ultima_tanda', label: 'ÚLTIMA TANDA' },
         { val: 'agotado', label: 'AGOTADO' }
       ];
@@ -1514,7 +1531,7 @@
       const timeVal = document.getElementById('evt-time').value;
 
       document.getElementById('preview-title').textContent = title;
-      document.getElementById('preview-status-badge').textContent = status.toUpperCase();
+      document.getElementById('preview-status-badge').textContent = STATUS_LABELS[status] || status.toUpperCase();
       document.getElementById('preview-dest').textContent = dest ? `DESTINO: ${dest}` : 'SIN DESTINO';
       const dateLabel = dateVal ? dateVal.split('-').reverse().join('/') : '';
       document.getElementById('preview-date').textContent = (dateVal && timeVal)

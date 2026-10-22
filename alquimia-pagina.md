@@ -75,7 +75,7 @@ Supabase-url: https://riwaytrjxkbpdkkpvxvx.supabase.co
 | `flyer_url`                | text null                                  | URL pública en Storage                                                                                    |
 | `ticket_url`               | text null                                  | Link externo de compra                                                                                    |
 | `ticket_button_label`      | text not null default 'Conseguir entradas' | Editable (no sabemos qué plataforma usan)                                                                 |
-| `status`                   | text not null default 'preparando'         | check in: `preparando`, `tanda_1`, `tanda_2`, `ultima_tanda`, `agotado`                                   |
+| `status`                   | text not null default 'preparando'         | check in: `preparando`, `tanda_1`, `tanda_2`, `tanda_3`, `tanda_4`, `tanda_especial`, `ultima_tanda`, `agotado` |
 | `drive_url`                | text null                                  | Link de Drive con fotos (se carga semanas después)                                                        |
 | `published`                | boolean not null default true              | Borrador/oculta si es `false`                                                                             |
 | `created_at`, `updated_at` | timestamptz default `now()`                | `updated_at` con trigger                                                                                  |
@@ -166,6 +166,9 @@ Tablero tipo _split-flap_ únicamente para `destination`.
 | `preparando`                 | `PREPARANDO JODA` (gris/blanco)            | Oculto. Texto "Muy pronto, seguinos en Instagram" con link |
 | `tanda_1`                    | `ENTRADAS A LA VENTA · TANDA 1` (rojo)     | Visible (`ticket_url`, `ticket_button_label`)              |
 | `tanda_2`                    | `ENTRADAS A LA VENTA · TANDA 2` (rojo)     | Visible                                                    |
+| `tanda_3`                    | `ENTRADAS A LA VENTA · TANDA 3` (rojo)     | Visible                                                    |
+| `tanda_4`                    | `ENTRADAS A LA VENTA · TANDA 4` (rojo)     | Visible                                                    |
+| `tanda_especial`             | `ENTRADAS A LA VENTA · TANDA ESPECIAL` (naranja) | Visible                                              |
 | `ultima_tanda`               | `ÚLTIMA TANDA` (rojo intenso, pulso sutil) | Visible                                                    |
 | `agotado`                    | `AGOTADO` (gris tachado/apagado)           | Deshabilitado, texto "Agotado"                             |
 | en curso (derivado)          | `ES HOY`                                   | Oculto                                                     |

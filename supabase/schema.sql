@@ -36,7 +36,17 @@ create table if not exists public.events (
     flyer_url text null,
     ticket_url text null,
     ticket_button_label text not null default 'Conseguir entradas',
-    status text not null default 'preparando' check (status in ('preparando', 'tanda_1', 'tanda_2', 'ultima_tanda', 'agotado')),
+    status text not null default 'preparando'
+        constraint events_status_check check (status in (
+            'preparando',
+            'tanda_1',
+            'tanda_2',
+            'tanda_3',
+            'tanda_4',
+            'tanda_especial',
+            'ultima_tanda',
+            'agotado'
+        )),
     drive_url text null,
     published boolean not null default true,
     created_at timestamptz not null default now(),
@@ -46,6 +56,21 @@ create table if not exists public.events (
 -- Índice por fecha del evento para ordenar rápido
 create index if not exists idx_events_event_date on public.events (event_date);
 create index if not exists idx_events_published on public.events (published);
+
+-- 3.1 ESTADOS DE TANDA (migración para bases ya creadas)
+-- Recrea la restricción para permitir tandas 3, 4 y especial.
+alter table public.events drop constraint if exists events_status_check;
+alter table public.events add constraint events_status_check
+    check (status in (
+        'preparando',
+        'tanda_1',
+        'tanda_2',
+        'tanda_3',
+        'tanda_4',
+        'tanda_especial',
+        'ultima_tanda',
+        'agotado'
+    ));
 
 -- 4. FUNCIÓN Y TRIGGERS PARA UPDATED_AT
 create or replace function public.handle_updated_at()
