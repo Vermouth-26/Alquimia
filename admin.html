@@ -896,7 +896,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpd2F5dHJqeGticGRra3B2eHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MjUyODUsImV4cCI6MjEwODIwMTI4NX0.oMu0L2ADnT20BGDk1tIIacScvvxiNh3EP50SaA-aiAw';
     const FINISH_AFTER_HOURS = 12;
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let allEvents = [];
     let siteSettings = null;
@@ -919,10 +919,10 @@
       setupDrawerEvents();
 
       // Verificar sesión existente
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseClient.auth.getSession();
       handleAuthState(session);
 
-      supabase.auth.onAuthStateChange((_event, session) => {
+      supabaseClient.auth.onAuthStateChange((_event, session) => {
         handleAuthState(session);
       });
     });
@@ -952,7 +952,7 @@
       btnText.textContent = 'Verificando...';
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
           email,
           password
         });
@@ -982,7 +982,7 @@
     });
 
     btnLogout.addEventListener('click', async () => {
-      await supabase.auth.signOut();
+      await supabaseClient.auth.signOut();
       showToast('Sesión cerrada', 'success');
     });
 
@@ -1076,7 +1076,7 @@
     }
 
     async function loadAdminEvents() {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('events')
         .select('*')
         .order('event_date', { ascending: true });
@@ -1308,7 +1308,7 @@
     }
 
     async function updateEventField(id, fields, successMsg) {
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('events')
         .update(fields)
         .eq('id', id);
@@ -1325,7 +1325,7 @@
       const confirmed = window.confirm(`¿Estás seguro de que querés ELIMINAR definitivamente la joda "${evt.title}"?\nEsta acción no se puede deshacer.`);
       if (!confirmed) return;
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('events')
         .delete()
         .eq('id', evt.id);
@@ -1546,7 +1546,7 @@
 
     async function uploadToStorage(blob, folder = 'flyers') {
       const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.jpg`;
-      const { data, error } = await supabase.storage
+      const { data, error } = await supabaseClient.storage
         .from('alquimia-media')
         .upload(fileName, blob, {
           contentType: 'image/jpeg',
@@ -1555,7 +1555,7 @@
 
       if (error) throw error;
 
-      const { data: publicData } = supabase.storage
+      const { data: publicData } = supabaseClient.storage
         .from('alquimia-media')
         .getPublicUrl(fileName);
 
@@ -1567,7 +1567,7 @@
         if (!publicUrl || !publicUrl.includes('/alquimia-media/')) return;
         const path = publicUrl.split('/alquimia-media/')[1];
         if (path) {
-          await supabase.storage.from('alquimia-media').remove([path]);
+          await supabaseClient.storage.from('alquimia-media').remove([path]);
         }
       } catch (err) {
         console.warn('No se pudo borrar archivo viejo de storage:', err);
@@ -1635,7 +1635,7 @@
 
         if (id) {
           // Editar
-          const { error } = await supabase
+          const { error } = await supabaseClient
             .from('events')
             .update(payload)
             .eq('id', id);
@@ -1643,7 +1643,7 @@
           showToast('Joda actualizada correctamente', 'success');
         } else {
           // Crear
-          const { error } = await supabase
+          const { error } = await supabaseClient
             .from('events')
             .insert([payload]);
           if (error) throw error;
@@ -1663,7 +1663,7 @@
 
     // 10.4 Ajustes Generales
     async function loadAdminSettings() {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('site_settings')
         .select('*')
         .eq('id', 1)
@@ -1702,7 +1702,7 @@
         if (siteSettings.background_url) {
           deleteStorageFile(siteSettings.background_url);
         }
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('site_settings')
           .update({ background_url: null })
           .eq('id', 1);
@@ -1759,7 +1759,7 @@
           og_image_url = await uploadToStorage(blob, 'og');
         }
 
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('site_settings')
           .update({
             site_title,
