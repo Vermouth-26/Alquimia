@@ -962,9 +962,19 @@
         }
 
         showToast('Sesión iniciada con éxito', 'success');
+
+        if (data && data.session) {
+          handleAuthState(data.session);
+        }
       } catch (err) {
         console.error('Error al iniciar sesión:', err);
-        showToast('Email o contraseña incorrectos', 'error');
+        let msg = err.message || 'Error al iniciar sesión';
+        if (msg.toLowerCase().includes('email not confirmed')) {
+          msg = '⚠️ Email sin confirmar: En Supabase andá a Authentication > Users, hacé clic en los tres puntitos (...) al lado de tu usuario y elegí "Confirm email".';
+        } else if (msg.toLowerCase().includes('invalid login credentials')) {
+          msg = 'Email o contraseña incorrectos. Revisá que esté bien escrito.';
+        }
+        showToast(msg, 'error');
       } finally {
         spinner.style.display = 'none';
         btnText.textContent = 'Ingresar';
@@ -998,9 +1008,10 @@
       toast.className = `toast-msg toast-${type}`;
       document.getElementById('toast-text').textContent = text;
       toast.style.display = 'flex';
+      const duration = type === 'error' ? 6500 : 3500;
       toastTimeout = setTimeout(() => {
         toast.style.display = 'none';
-      }, 3500);
+      }, duration);
     }
 
     // Validador de URL
@@ -1072,6 +1083,14 @@
 
       if (error) {
         showToast('Error cargando jodas: ' + error.message, 'error');
+        const listProximas = document.getElementById('list-proximas');
+        const listPasadas = document.getElementById('list-pasadas');
+        if (listProximas) {
+          listProximas.innerHTML = '<div style="background: rgba(122,12,18,0.25); border: 1px dashed var(--red-bright); border-radius: var(--radius); padding: 20px; text-align: center;"><p style="font-weight:700; color:#FF8A80; font-size:1.1rem; margin-bottom:8px;">⚠️ Falta ejecutar schema.sql en Supabase</p><p style="font-size:0.85rem; color:#DDD; max-width:440px; margin:0 auto 12px;">La tabla <code>events</code> no existe aún. Andá a Supabase &gt; SQL Editor, copiá el contenido de <code>supabase/schema.sql</code> y hacé clic en Run.</p></div>';
+        }
+        if (listPasadas) {
+          listPasadas.innerHTML = '<p style="color: var(--gray-light); text-align: center; padding: 20px;">Pendiente de inicialización en Supabase.</p>';
+        }
         return;
       }
 
